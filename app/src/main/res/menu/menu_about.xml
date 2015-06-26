@@ -12,10 +12,6 @@
         android:title="Downloads"
         app:showAsAction="never" />
     <item
-        android:id="@+id/back"
-        android:title="Back"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/exit"
         android:title="Exit"
         app:showAsAction="never" />

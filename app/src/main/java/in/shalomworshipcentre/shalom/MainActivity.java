@@ -37,22 +37,19 @@ public class MainActivity extends ActionBarActivity {
         myWebView.setWebChromeClient(new WebChromeClient());
         //cache enabled
         myWebView.getSettings().setAppCacheEnabled(true);
+        //the way the cache is used
+        myWebView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         //Enabling JavaScript
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-
-        //the way the cache is used
-        myWebView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-
-        //Handling Page Navigation in same view
+        // Function to load all URLs in same webview
         myWebView.setWebViewClient(new WebViewClient());
-
-
         //zoom feature
         myWebView.getSettings().setBuiltInZoomControls(true);
         // dont show zoom controls
         myWebView.getSettings().setDisplayZoomControls(false);
-
+        //allow file access-- not sure what it is...
+        myWebView.getSettings().setAllowFileAccess(true);
         //disabling debugging in webview
         WebView.setWebContentsDebuggingEnabled(false);
 
@@ -83,10 +80,8 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        //allow file access-- not sure what it is...
-        // myWebView.getSettings().setAllowFileAccess(true);
-
     }
+
 
     // Navigating web page history by clicking back button
     @Override
@@ -123,6 +118,10 @@ public class MainActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.downloads:
+                Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
+                        .show();
+                Intent in = new Intent(MainActivity.this, Downloads.class);
+                startActivity(in);
                 return true;
 
             case R.id.refresh:

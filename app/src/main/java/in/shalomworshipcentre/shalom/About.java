@@ -1,10 +1,10 @@
 package in.shalomworshipcentre.shalom;
 
 import android.app.DownloadManager;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,7 +15,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-public class About extends MainActivity {
+public class About extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +73,7 @@ public class About extends MainActivity {
 
         WebView myWebView = (WebView) findViewById(R.id.about);
         // Check if the key event was the Back button and if there's history
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && myWebView.canGoBack()) {
             myWebView.goBack();
             return true;
         }
@@ -81,6 +81,8 @@ public class About extends MainActivity {
         // system behavior (probably exit the activity)
         return super.onKeyDown(keyCode, event);
     }
+
+
 
 
     @Override
@@ -109,14 +111,15 @@ public class About extends MainActivity {
                 WebView myWebView = (WebView) findViewById(R.id.about);
                 myWebView.reload();
                 return true;
-            case R.id.back:
+            /*case R.id.back:
                 Toast.makeText(this, "Back..", Toast.LENGTH_SHORT)
                         .show();
                 Intent i = new Intent(About.this, MainActivity.class);
                 startActivity(i);
                 finish();
-                return true;
-            //only goes to previous activity-- System.exit(0);
+                return true;*///but this starts another copy of the previous activity
+            case R.id.exit:
+                System.exit(0);
 
 
 

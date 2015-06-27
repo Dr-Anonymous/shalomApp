@@ -4,12 +4,12 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/refresh"
-        android:title="Refresh"
+        android:id="@+id/check"
+        android:title="Check For Update"
         app:showAsAction="never" />
     <item
-        android:id="@+id/downloads"
-        android:title="Downloads"
+        android:id="@+id/about"
+        android:title="Today!"
         app:showAsAction="never" />
     <item
         android:id="@+id/exit"

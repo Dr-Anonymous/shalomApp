@@ -1,6 +1,4 @@
 <resources>
     <string name="app_name">Shalom</string>
-
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="about">Shalom application and shalomworshipcentre.in are properties of SHALOM WORSHIP CENTRE.</string>
 </resources>

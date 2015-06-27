@@ -27,8 +27,8 @@
         </activity>
 
         <activity
-            android:name=".About"
-            android:label="About"
+            android:name=".Today"
+            android:label="Today!"
             android:parentActivityName=".MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
@@ -38,8 +38,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Downloads"
-            android:label="Downloads"
+            android:name=".About"
+            android:label="About"
             android:parentActivityName=".MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>

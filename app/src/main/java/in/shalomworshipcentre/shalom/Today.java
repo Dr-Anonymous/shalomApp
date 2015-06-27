@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -17,52 +16,39 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-
-public class MainActivity extends ActionBarActivity {
-
+public class Today extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
+        setContentView(R.layout.today);
 
         //url loading
-        WebView myWebView = (WebView) findViewById(R.id.webview);
-        myWebView.loadUrl("http://www.shalomworshipcentre.in");
+        WebView myWebView = (WebView) findViewById(R.id.today);
+        myWebView.loadUrl("http://www.nrigh.esy.es");
 
-        // actionbar overlay
-        //getWindow().requestFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
 
         //chrome client
         myWebView.setWebChromeClient(new WebChromeClient());
         //cache enabled
         myWebView.getSettings().setAppCacheEnabled(true);
-        //the way the cache is used
-        myWebView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         //Enabling JavaScript
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        // Function to load all URLs in same webview
+
+        //the way the cache is used
+        myWebView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+
+        //Handling Page Navigation in same view
         myWebView.setWebViewClient(new WebViewClient());
+
+
         //zoom feature
         myWebView.getSettings().setBuiltInZoomControls(true);
         // dont show zoom controls
         myWebView.getSettings().setDisplayZoomControls(false);
-        //allow file access-- not sure what it is...
-        myWebView.getSettings().setAllowFileAccess(true);
+
         //disabling debugging in webview
         WebView.setWebContentsDebuggingEnabled(false);
-
-        /** //downloading files using external brweser
-         myWebView.setDownloadListener(new DownloadListener() {
-         public void onDownloadStart(String url, String userAgent,
-         String contentDisposition, String mimetype,
-         long contentLength) {
-         Intent i = new Intent(Intent.ACTION_VIEW);
-         i.setData(Uri.parse(url));
-         startActivity(i);
-         }
-         }); */
 
         //download using download manager
         myWebView.setDownloadListener(new DownloadListener() {
@@ -73,21 +59,19 @@ public class MainActivity extends ActionBarActivity {
                         Uri.parse(url));
                 request.allowScanningByMediaScanner();
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "ShalomWorshipCentre");
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Shalom_App");
                 DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                 dm.enqueue(request);
 
             }
         });
-
     }
-
 
     // Navigating web page history by clicking back button
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
-        WebView myWebView = (WebView) findViewById(R.id.webview);
+        WebView myWebView = (WebView) findViewById(R.id.today);
         // Check if the key event was the Back button and if there's history
         if ((keyCode == KeyEvent.KEYCODE_BACK) && myWebView.canGoBack()) {
             myWebView.goBack();
@@ -99,11 +83,13 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        ActionBar actionBar = getSupportActionBar();
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_today, menu);
 
         //hide action bar
         actionBar.hide();
@@ -111,45 +97,31 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
-            case R.id.today:
-                Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
-                        .show();
-                Intent today = new Intent(MainActivity.this, Today.class);
-                startActivity(today);
-                return true;
-
-            case R.id.refresh:
-                Toast.makeText(this, "Refreshing..", Toast.LENGTH_SHORT)
-                        .show();
-                WebView myWebView = (WebView) findViewById(R.id.main);
-                myWebView.reload();
-                return true;
-
             case R.id.about:
                 Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
                         .show();
-                Intent about = new Intent(MainActivity.this, About.class);
+                Intent about = new Intent(Today.this, About.class);
                 startActivity(about);
                 return true;
-            /*case R.id.home:
-                Intent intent = new Intent(Intent.ACTION_MAIN);
-                intent.addCategory(Intent.CATEGORY_HOME);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                return true;*/
+            case R.id.refresh:
+                Toast.makeText(this, "Refreshing..", Toast.LENGTH_SHORT)
+                        .show();
+                WebView myWebView = (WebView) findViewById(R.id.today);
+                myWebView.reload();
+                return true;
             case R.id.exit:
                 System.exit(0);
 
+
+
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-
-        return super.onOptionsItemSelected(item);
     }
+
 
 }

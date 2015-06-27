@@ -90,7 +90,7 @@ public class Today extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_today, menu);
 
         //hide action bar
-        actionBar.hide();
+        //actionBar.hide();
         return true;
     }
 

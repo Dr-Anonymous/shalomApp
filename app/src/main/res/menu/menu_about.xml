@@ -5,14 +5,17 @@
 
     <item
         android:id="@+id/check"
+        android:icon="@drawable/update"
         android:title="Check For Update"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/today"
+        android:icon="@drawable/today"
         android:title="Today!"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/exit"
+        android:icon="@drawable/exit"
         android:title="Exit"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
 </menu>

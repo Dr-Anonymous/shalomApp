@@ -111,7 +111,7 @@ public class Check extends ActionBarActivity{
         getMenuInflater().inflate(R.menu.menu_about, menu);
 
         //hide action bar
-        actionBar.hide();
+        //actionBar.hide();
         return true;
     }
 

@@ -24,8 +24,9 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-                //exit pressed from next activity
-        if( getIntent().getBooleanExtra("Exit", false)){
+
+        //exit pressed from next activity
+        if (getIntent().getBooleanExtra("Exit", false)) {
             finish();
             return; // add this to prevent from doing unnecessary stuffs
         }
@@ -103,16 +104,31 @@ public class MainActivity extends ActionBarActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+    private static final int TIME_INTERVAL = 2000; // # milliseconds, desired time passed between two back presses.
+    private long mBackPressed;
+
+    @Override
+    public void onBackPressed() {
+        if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
+            super.onBackPressed();
+            return;
+        } else {
+            Toast.makeText(getBaseContext(), "Tap back button once more to exit", Toast.LENGTH_SHORT).show();
+        }
+
+        mBackPressed = System.currentTimeMillis();
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         ActionBar actionBar = getSupportActionBar();
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-
         //hide action bar
-        actionBar.hide();
+        //actionBar.hide();
         return true;
+
     }
 
 

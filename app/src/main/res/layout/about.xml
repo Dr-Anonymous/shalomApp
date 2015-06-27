@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:longClickable="true"
     android:orientation="vertical">
 
     <ImageView
@@ -9,16 +10,8 @@
         android:layout_height="fill_parent"
         android:id="@+id/logo"
         android:src="@drawable/logo"
-        android:background="#ffffdaf6"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/logo"
-        android:background="#ffecbff2"
-        android:gravity="center_horizontal"
-        android:textColor="#ff8c1a1c"
-        android:textSize="50dp"
-        android:text="About"/>
+        android:background="#fffeebff"/>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -4,19 +4,23 @@
     tools:context=".MainActivity">
     <item
         android:id="@+id/refresh"
+        android:icon="@drawable/refresh"
         android:title="Refresh"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/today"
+        android:icon="@drawable/today"
         android:title="Today!"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/about"
+        android:icon="@drawable/about"
         android:title="About"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/exit"
+        android:icon="@drawable/exit"
         android:title="Exit"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
 </menu>

@@ -24,10 +24,15 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+                //exit pressed from next activity
+        if( getIntent().getBooleanExtra("Exit", false)){
+            finish();
+            return; // add this to prevent from doing unnecessary stuffs
+        }
 
 
         //url loading
-        WebView myWebView = (WebView) findViewById(R.id.webview);
+        WebView myWebView = (WebView) findViewById(R.id.main);
         myWebView.loadUrl("http://www.shalomworshipcentre.in");
 
         // actionbar overlay
@@ -73,7 +78,7 @@ public class MainActivity extends ActionBarActivity {
                         Uri.parse(url));
                 request.allowScanningByMediaScanner();
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "ShalomWorshipCentre");
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Shalom_Messages");
                 DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                 dm.enqueue(request);
 
@@ -87,7 +92,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
-        WebView myWebView = (WebView) findViewById(R.id.webview);
+        WebView myWebView = (WebView) findViewById(R.id.main);
         // Check if the key event was the Back button and if there's history
         if ((keyCode == KeyEvent.KEYCODE_BACK) && myWebView.canGoBack()) {
             myWebView.goBack();
@@ -144,7 +149,7 @@ public class MainActivity extends ActionBarActivity {
                 startActivity(intent);
                 return true;*/
             case R.id.exit:
-                System.exit(0);
+                finish();
 
         }
 

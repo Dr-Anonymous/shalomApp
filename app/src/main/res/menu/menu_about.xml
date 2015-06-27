@@ -8,7 +8,7 @@
         android:title="Check For Update"
         app:showAsAction="never" />
     <item
-        android:id="@+id/about"
+        android:id="@+id/today"
         android:title="Today!"
         app:showAsAction="never" />
     <item

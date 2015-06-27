@@ -39,16 +39,21 @@ public class About extends ActionBarActivity {
                         .show();
                 Intent today = new Intent(About.this, Today.class);
                 startActivity(today);
+                finish();
                 return true;
             case R.id.check:
                 Toast.makeText(this, "Checking for Update..", Toast.LENGTH_SHORT)
                         .show();
-                Intent check = new Intent(About.this, MainActivity.class);
+                Intent check = new Intent(About.this, Check.class);
                 startActivity(check);
                 finish();
                 return true;
             case R.id.exit:
-                System.exit(0);
+                Intent exit = new Intent(this, MainActivity.class);
+                exit.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                exit.putExtra("Exit", true);
+                startActivity(exit);
+                finish();
 
         }
         return super.onOptionsItemSelected(item);

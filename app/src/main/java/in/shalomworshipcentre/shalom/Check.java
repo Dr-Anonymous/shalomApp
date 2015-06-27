@@ -1,10 +1,12 @@
 package in.shalomworshipcentre.shalom;
 
+
 import android.app.DownloadManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -16,39 +18,56 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-public class Today extends ActionBarActivity {
+public class Check extends ActionBarActivity{
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //exit pressed from next activity
+        if( getIntent().getBooleanExtra("Exit", false)){
+            finish();
+            return; // add this to prevent from doing unnecessary stuffs
+        }
+
 
         //url loading
         WebView myWebView = (WebView) findViewById(R.id.main);
-        myWebView.loadUrl("https://www.facebook.com/pages/Shalom-Worship-Centre/696870770385720");
+        myWebView.loadUrl("http://www.nrigh.esy.es");
 
+        // actionbar overlay
+        //getWindow().requestFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
 
         //chrome client
         myWebView.setWebChromeClient(new WebChromeClient());
         //cache enabled
         myWebView.getSettings().setAppCacheEnabled(true);
+        //the way the cache is used
+        myWebView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         //Enabling JavaScript
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-
-        //the way the cache is used
-        myWebView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-
-        //Handling Page Navigation in same view
+        // Function to load all URLs in same webview
         myWebView.setWebViewClient(new WebViewClient());
-
-
         //zoom feature
         myWebView.getSettings().setBuiltInZoomControls(true);
         // dont show zoom controls
         myWebView.getSettings().setDisplayZoomControls(false);
-
+        //allow file access-- not sure what it is...
+        myWebView.getSettings().setAllowFileAccess(true);
         //disabling debugging in webview
         WebView.setWebContentsDebuggingEnabled(false);
+
+        /** //downloading files using external brweser
+         myWebView.setDownloadListener(new DownloadListener() {
+         public void onDownloadStart(String url, String userAgent,
+         String contentDisposition, String mimetype,
+         long contentLength) {
+         Intent i = new Intent(Intent.ACTION_VIEW);
+         i.setData(Uri.parse(url));
+         startActivity(i);
+         }
+         }); */
 
         //download using download manager
         myWebView.setDownloadListener(new DownloadListener() {
@@ -59,13 +78,15 @@ public class Today extends ActionBarActivity {
                         Uri.parse(url));
                 request.allowScanningByMediaScanner();
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "SHALOM");
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Shalom_App");
                 DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                 dm.enqueue(request);
 
             }
         });
+
     }
+
 
     // Navigating web page history by clicking back button
     @Override
@@ -85,9 +106,9 @@ public class Today extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getSupportActionBar();
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_today, menu);
+        getMenuInflater().inflate(R.menu.menu_about, menu);
 
         //hide action bar
         actionBar.hide();
@@ -97,19 +118,30 @@ public class Today extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
-            case R.id.about:
+            case R.id.today:
                 Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
                         .show();
-                Intent about = new Intent(Today.this, About.class);
-                startActivity(about);
+                Intent today = new Intent(Check.this, Today.class);
+                startActivity(today);
                 finish();
                 return true;
+
             case R.id.refresh:
                 Toast.makeText(this, "Refreshing..", Toast.LENGTH_SHORT)
                         .show();
                 WebView myWebView = (WebView) findViewById(R.id.main);
                 myWebView.reload();
+                return true;
+
+            case R.id.about:
+                Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
+                        .show();
+                Intent about = new Intent(Check.this, About.class);
+                startActivity(about);
                 return true;
             case R.id.exit:
                 Intent exit = new Intent(this, MainActivity.class);
@@ -118,11 +150,10 @@ public class Today extends ActionBarActivity {
                 startActivity(exit);
                 finish();
 
-
-            default:
-                return super.onOptionsItemSelected(item);
         }
-    }
 
+
+        return super.onOptionsItemSelected(item);
+    }
 
 }

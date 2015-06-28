@@ -22,9 +22,16 @@ public class Today extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //url loading
         WebView myWebView = (WebView) findViewById(R.id.main);
-        myWebView.loadUrl("https://www.facebook.com/pages/Shalom-Worship-Centre/696870770385720");
+
+        //url loading
+        if (!DetectConnection.checkInternetConnection(this)) {
+            Toast.makeText(getApplicationContext(), "No Internet! Please enable net and hit 'Refresh'", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+        } else {myWebView.loadUrl("https://www.facebook.com/pages/Shalom-Worship-Centre/696870770385720");
+        }
+
+
 
 
         //chrome client
@@ -36,16 +43,16 @@ public class Today extends ActionBarActivity {
         webSettings.setJavaScriptEnabled(true);
 
         //the way the cache is used
-        myWebView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
 
         //Handling Page Navigation in same view
         myWebView.setWebViewClient(new WebViewClient());
 
 
         //zoom feature
-        myWebView.getSettings().setBuiltInZoomControls(true);
+        webSettings.setBuiltInZoomControls(true);
         // dont show zoom controls
-        myWebView.getSettings().setDisplayZoomControls(false);
+        webSettings.setDisplayZoomControls(false);
 
         //disabling debugging in webview
         WebView.setWebContentsDebuggingEnabled(false);

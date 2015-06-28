@@ -38,24 +38,24 @@ public class MainActivity extends ActionBarActivity {
 
         // actionbar overlay
         //getWindow().requestFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
-
-        //chrome client
-        myWebView.setWebChromeClient(new WebChromeClient());
-        //cache enabled
-        myWebView.getSettings().setAppCacheEnabled(true);
-        //the way the cache is used
-        myWebView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         //Enabling JavaScript
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        //chrome client
+        myWebView.setWebChromeClient(new WebChromeClient());
+        //cache enabled
+        webSettings.setAppCacheEnabled(true);
+        //the way the cache is used
+        webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+
         // Function to load all URLs in same webview
         myWebView.setWebViewClient(new WebViewClient());
         //zoom feature
-        myWebView.getSettings().setBuiltInZoomControls(true);
+        webSettings.setBuiltInZoomControls(true);
         // dont show zoom controls
-        myWebView.getSettings().setDisplayZoomControls(false);
+        webSettings.setDisplayZoomControls(false);
         //allow file access-- not sure what it is...
-        myWebView.getSettings().setAllowFileAccess(true);
+        webSettings.setAllowFileAccess(true);
         //disabling debugging in webview
         WebView.setWebContentsDebuggingEnabled(false);
 
@@ -138,25 +138,38 @@ public class MainActivity extends ActionBarActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
-            case R.id.today:
-                Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
-                        .show();
-                Intent today = new Intent(MainActivity.this, Today.class);
-                startActivity(today);
-                return true;
-
             case R.id.refresh:
                 Toast.makeText(this, "Refreshing..", Toast.LENGTH_SHORT)
                         .show();
                 WebView myWebView = (WebView) findViewById(R.id.main);
                 myWebView.reload();
                 return true;
-
+            case R.id.today:
+                Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
+                        .show();
+                Intent today = new Intent(MainActivity.this, Today.class);
+                startActivity(today);
+                return true;
+            case R.id.downloads:
+                Uri uri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
+                        + "");
+                Intent open = new Intent(Intent.ACTION_VIEW);
+                open.setDataAndType(uri, "*/*");
+                startActivity(Intent.createChooser(open, "Open downloaded files"));
+            return true;
             case R.id.about:
                 Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
                         .show();
                 Intent about = new Intent(MainActivity.this, About.class);
                 startActivity(about);
+                return true;
+            case R.id.share:
+                Intent share = new Intent();
+                share.setAction(Intent.ACTION_SEND);
+                share.putExtra(Intent.EXTRA_TEXT,
+                        "Hey check out this app at: http://shalomworshipcentre.in/app.html");
+                share.setType("text/plain");
+                startActivity(share);
                 return true;
             /*case R.id.home:
                 Intent intent = new Intent(Intent.ACTION_MAIN);

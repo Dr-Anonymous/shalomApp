@@ -48,6 +48,14 @@ public class About extends ActionBarActivity {
                 startActivity(check);
                 finish();
                 return true;
+            case R.id.share:
+                Intent share = new Intent();
+                share.setAction(Intent.ACTION_SEND);
+                share.putExtra(Intent.EXTRA_TEXT,
+                        "Hey check out this app at: http://shalomworshipcentre.in/app.html");
+                share.setType("text/plain");
+                startActivity(share);
+                return true;
             case R.id.exit:
                 Intent exit = new Intent(this, MainActivity.class);
                 exit.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

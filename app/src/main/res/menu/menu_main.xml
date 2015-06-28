@@ -12,15 +12,25 @@
         android:icon="@drawable/today"
         android:title="Today!"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/downloads"
+        android:icon="@drawable/downloads"
+        android:title="Downloads"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/about"
         android:icon="@drawable/about"
         android:title="About"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/share"
+        android:icon="@drawable/share"
+        android:title="Share"
         app:showAsAction="always" />
     <item
         android:id="@+id/exit"
         android:icon="@drawable/exit"
         android:title="Exit"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 </menu>

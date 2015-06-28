@@ -7,15 +7,20 @@
         android:id="@+id/check"
         android:icon="@drawable/update"
         android:title="Check For Update"
-        app:showAsAction="always" />
+        app:showAsAction="always|withText" />
     <item
         android:id="@+id/today"
         android:icon="@drawable/today"
         android:title="Today!"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/share"
+        android:icon="@drawable/share"
+        android:title="Share"
         app:showAsAction="always" />
     <item
         android:id="@+id/exit"
         android:icon="@drawable/exit"
         android:title="Exit"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
 </menu>

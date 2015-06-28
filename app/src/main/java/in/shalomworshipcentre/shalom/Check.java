@@ -30,44 +30,36 @@ public class Check extends ActionBarActivity{
             return; // add this to prevent from doing unnecessary stuffs
         }
 
+        WebView myWebView = (WebView) findViewById(R.id.main);
 
         //url loading
-        WebView myWebView = (WebView) findViewById(R.id.main);
-        myWebView.loadUrl("http://www.nrigh.esy.es");
+        if (!DetectConnection.checkInternetConnection(this)) {
+            Toast.makeText(getApplicationContext(), "No Internet! Please enable net and hit 'Refresh'", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+        } else {myWebView.loadUrl("http://www.nrigh.esy.es");
+        }
 
-        // actionbar overlay
-        //getWindow().requestFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
+        //Enabling JavaScript
+        WebSettings webSettings = myWebView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
 
         //chrome client
         myWebView.setWebChromeClient(new WebChromeClient());
         //cache enabled
-        myWebView.getSettings().setAppCacheEnabled(true);
+        webSettings.setAppCacheEnabled(true);
         //the way the cache is used
-        myWebView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        //Enabling JavaScript
-        WebSettings webSettings = myWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+
         // Function to load all URLs in same webview
         myWebView.setWebViewClient(new WebViewClient());
         //zoom feature
-        myWebView.getSettings().setBuiltInZoomControls(true);
+        webSettings.setBuiltInZoomControls(true);
         // dont show zoom controls
-        myWebView.getSettings().setDisplayZoomControls(false);
+        webSettings.setDisplayZoomControls(false);
         //allow file access-- not sure what it is...
-        myWebView.getSettings().setAllowFileAccess(true);
+        webSettings.setAllowFileAccess(true);
         //disabling debugging in webview
         WebView.setWebContentsDebuggingEnabled(false);
-
-        /** //downloading files using external brweser
-         myWebView.setDownloadListener(new DownloadListener() {
-         public void onDownloadStart(String url, String userAgent,
-         String contentDisposition, String mimetype,
-         long contentLength) {
-         Intent i = new Intent(Intent.ACTION_VIEW);
-         i.setData(Uri.parse(url));
-         startActivity(i);
-         }
-         }); */
 
         //download using download manager
         myWebView.setDownloadListener(new DownloadListener() {
@@ -136,7 +128,6 @@ public class Check extends ActionBarActivity{
                 WebView myWebView = (WebView) findViewById(R.id.main);
                 myWebView.reload();
                 return true;
-
             case R.id.about:
                 Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
                         .show();

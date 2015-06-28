@@ -35,18 +35,27 @@ public class About extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.today:
-                Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
-                        .show();
-                Intent today = new Intent(About.this, Today.class);
-                startActivity(today);
-                finish();
+                if (!DetectConnection.checkInternetConnection(this)) {
+                    Toast.makeText(getApplicationContext(), "No Internet! Please enable net and retry", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+                } else {finish();
+                    Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
+                            .show();
+                    Intent today = new Intent(About.this, Today.class);
+                    startActivity(today);
+                }
                 return true;
             case R.id.check:
-                Toast.makeText(this, "Checking for Update..", Toast.LENGTH_SHORT)
-                        .show();
-                Intent check = new Intent(About.this, Check.class);
-                startActivity(check);
-                finish();
+                if (!DetectConnection.checkInternetConnection(this)) {
+                    Toast.makeText(getApplicationContext(), "No Internet! Please enable net and retry", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+                } else {
+                    Toast.makeText(this, "Checking for Update..", Toast.LENGTH_SHORT)
+                            .show();
+                    Intent check = new Intent(About.this, Check.class);
+                    startActivity(check);
+                    finish();
+                }
                 return true;
             case R.id.share:
                 Intent share = new Intent();
@@ -62,7 +71,6 @@ public class About extends ActionBarActivity {
                 exit.putExtra("Exit", true);
                 startActivity(exit);
                 finish();
-
         }
         return super.onOptionsItemSelected(item);
     }

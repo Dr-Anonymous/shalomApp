@@ -25,15 +25,7 @@ public class Today extends ActionBarActivity {
         WebView myWebView = (WebView) findViewById(R.id.main);
 
         //url loading
-        if (!DetectConnection.checkInternetConnection(this)) {
-            Toast.makeText(getApplicationContext(), "No Internet! Please enable net and hit 'Refresh'", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
-        } else {myWebView.loadUrl("https://www.facebook.com/pages/Shalom-Worship-Centre/696870770385720");
-        }
-
-
-
-
+        myWebView.loadUrl("https://www.facebook.com/pages/Shalom-Worship-Centre/696870770385720");
         //chrome client
         myWebView.setWebChromeClient(new WebChromeClient());
         //cache enabled

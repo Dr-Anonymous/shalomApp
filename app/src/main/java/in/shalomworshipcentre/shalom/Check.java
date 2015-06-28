@@ -18,26 +18,21 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-public class Check extends ActionBarActivity{
+public class Check extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //exit pressed from next activity
-        if( getIntent().getBooleanExtra("Exit", false)){
+        if (getIntent().getBooleanExtra("Exit", false)) {
             finish();
             return; // add this to prevent from doing unnecessary stuffs
         }
 
         WebView myWebView = (WebView) findViewById(R.id.main);
-
         //url loading
-        if (!DetectConnection.checkInternetConnection(this)) {
-            Toast.makeText(getApplicationContext(), "No Internet! Please enable net and hit 'Refresh'", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
-        } else {myWebView.loadUrl("http://www.nrigh.esy.es");
-        }
+        myWebView.loadUrl("http://shalomworshipcentre.in/omni/omni/index.html");
 
         //Enabling JavaScript
         WebSettings webSettings = myWebView.getSettings();
@@ -100,7 +95,7 @@ public class Check extends ActionBarActivity{
     public boolean onCreateOptionsMenu(Menu menu) {
         ActionBar actionBar = getSupportActionBar();
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_about, menu);
+        getMenuInflater().inflate(R.menu.menu_check, menu);
 
         //hide action bar
         //actionBar.hide();
@@ -115,13 +110,17 @@ public class Check extends ActionBarActivity{
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.today:
-                Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
-                        .show();
-                Intent today = new Intent(Check.this, Today.class);
-                startActivity(today);
-                finish();
+                if (!DetectConnection.checkInternetConnection(this)) {
+                    Toast.makeText(getApplicationContext(), "No Internet! Please enable net and try again", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+                } else {
+                    Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
+                            .show();
+                    Intent today = new Intent(Check.this, Today.class);
+                    startActivity(today);
+                    finish();
+                }
                 return true;
-
             case R.id.refresh:
                 Toast.makeText(this, "Refreshing..", Toast.LENGTH_SHORT)
                         .show();
@@ -133,6 +132,7 @@ public class Check extends ActionBarActivity{
                         .show();
                 Intent about = new Intent(Check.this, About.class);
                 startActivity(about);
+                finish();
                 return true;
             case R.id.exit:
                 Intent exit = new Intent(this, MainActivity.class);

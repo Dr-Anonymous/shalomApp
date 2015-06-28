@@ -139,24 +139,35 @@ public class MainActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.refresh:
-                Toast.makeText(this, "Refreshing..", Toast.LENGTH_SHORT)
-                        .show();
                 WebView myWebView = (WebView) findViewById(R.id.main);
-                myWebView.reload();
+                if (!DetectConnection.checkInternetConnection(this)) {
+                    Toast.makeText(getApplicationContext(), "No Internet! Please enable net and hit 'Refresh'", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+                } else {
+                    Toast.makeText(this, "Refreshing..", Toast.LENGTH_SHORT)
+                            .show();
+                    myWebView.clearCache(true);
+                    myWebView.reload();
+                }
                 return true;
             case R.id.today:
-                Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
-                        .show();
-                Intent today = new Intent(MainActivity.this, Today.class);
-                startActivity(today);
+                if (!DetectConnection.checkInternetConnection(this)) {
+                    Toast.makeText(getApplicationContext(), "No Internet! Please enable net and retry", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+                } else {
+                    Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
+                            .show();
+                    Intent today = new Intent(MainActivity.this, Today.class);
+                    startActivity(today);
+                }
                 return true;
-            case R.id.downloads:
-                Uri uri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
-                        + "");
-                Intent open = new Intent(Intent.ACTION_VIEW);
-                open.setDataAndType(uri, "*/*");
-                startActivity(Intent.createChooser(open, "Open downloaded files"));
-            return true;
+            /**case R.id.downloads:
+             * * Uri uri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
+             *        + "");
+             *Intent open = new Intent(Intent.ACTION_VIEW);
+             * *open.setDataAndType(uri, "enter file mime type here");
+             * startActivity(Intent.createChooser(open, "Open downloaded files"));
+             return true; */
             case R.id.about:
                 Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
                         .show();

@@ -113,7 +113,7 @@ public class MainActivity extends ActionBarActivity {
             super.onBackPressed();
             return;
         } else {
-            Toast.makeText(getBaseContext(), "Tap back button once more to exit", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getBaseContext(), "Tap 'Back' once more to exit", Toast.LENGTH_SHORT).show();
         }
 
         mBackPressed = System.currentTimeMillis();
@@ -128,9 +128,7 @@ public class MainActivity extends ActionBarActivity {
         //hide action bar
         //actionBar.hide();
         return true;
-
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -141,7 +139,7 @@ public class MainActivity extends ActionBarActivity {
             case R.id.refresh:
                 WebView myWebView = (WebView) findViewById(R.id.main);
                 if (!DetectConnection.checkInternetConnection(this)) {
-                    Toast.makeText(getApplicationContext(), "No Internet! Please enable net and hit 'Refresh'", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "No Internet! Please enable net and then hit 'Refresh'", Toast.LENGTH_LONG).show();
                     startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
                 } else {
                     Toast.makeText(this, "Refreshing..", Toast.LENGTH_SHORT)
@@ -182,6 +180,17 @@ public class MainActivity extends ActionBarActivity {
                 share.setType("text/plain");
                 startActivity(share);
                 return true;
+            case R.id.screenshot:
+                ShareScreenshot ss = new ShareScreenshot(MainActivity.this);
+                ss.shareImage();
+                return true;
+            case R.id.restart:
+                Toast.makeText(this, "Clean slate..", Toast.LENGTH_SHORT)
+                        .show();
+                Intent restart = new Intent(MainActivity.this, MainActivity.class);
+                startActivity(restart);
+                finish();
+                return true;
             /*case R.id.home:
                 Intent intent = new Intent(Intent.ACTION_MAIN);
                 intent.addCategory(Intent.CATEGORY_HOME);
@@ -192,9 +201,6 @@ public class MainActivity extends ActionBarActivity {
                 finish();
 
         }
-
-
         return super.onOptionsItemSelected(item);
     }
-
 }

@@ -13,18 +13,27 @@
         android:title="Today!"
         app:showAsAction="always" />
     <item
-        android:id="@+id/about"
-        android:icon="@drawable/about"
-        android:title="About"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/share"
         android:icon="@drawable/share"
         android:title="Share"
         app:showAsAction="always" />
     <item
+        android:id="@+id/screenshot"
+        android:icon="@drawable/camera"
+        android:title="Share screenshot"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/about"
+        android:icon="@drawable/about"
+        android:title="About"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/restart"
+        android:title="Restart app"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/exit"
         android:icon="@drawable/exit"
         android:title="Exit"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 </menu>

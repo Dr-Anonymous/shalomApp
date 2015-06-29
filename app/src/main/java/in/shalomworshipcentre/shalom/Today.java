@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -33,19 +34,18 @@ public class Today extends ActionBarActivity {
         //Enabling JavaScript
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-
+        //form data and password
+        webSettings.setSaveFormData(true);
+        //cookie accepted
+        CookieManager.getInstance().setAcceptCookie(true);
         //the way the cache is used
         webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-
         //Handling Page Navigation in same view
         myWebView.setWebViewClient(new WebViewClient());
-
-
         //zoom feature
         webSettings.setBuiltInZoomControls(true);
         // dont show zoom controls
         webSettings.setDisplayZoomControls(false);
-
         //disabling debugging in webview
         WebView.setWebContentsDebuggingEnabled(false);
 

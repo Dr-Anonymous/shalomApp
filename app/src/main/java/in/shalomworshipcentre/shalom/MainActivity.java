@@ -24,20 +24,27 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setTitle("");
+
+        //hide actionbar after delay
+        /*Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // DO DELAYED STUFF
+                getSupportActionBar().hide();
+            }
+        }, 3000);*/
 
         //exit pressed from next activity
         if (getIntent().getBooleanExtra("Exit", false)) {
             finish();
             return; // add this to prevent from doing unnecessary stuffs
         }
-
-
-        //url loading
         WebView myWebView = (WebView) findViewById(R.id.main);
+        //url loading
         myWebView.loadUrl("http://www.shalomworshipcentre.in");
 
-        // actionbar overlay
-        //getWindow().requestFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
         //Enabling JavaScript
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -88,11 +95,9 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-
     // Navigating web page history by clicking back button
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
         WebView myWebView = (WebView) findViewById(R.id.main);
         // Check if the key event was the Back button and if there's history
         if ((keyCode == KeyEvent.KEYCODE_BACK) && myWebView.canGoBack()) {
@@ -115,7 +120,6 @@ public class MainActivity extends ActionBarActivity {
         } else {
             Toast.makeText(getBaseContext(), "Tap 'Back' once more to exit", Toast.LENGTH_SHORT).show();
         }
-
         mBackPressed = System.currentTimeMillis();
     }
 
@@ -130,14 +134,15 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        WebView myWebView = (WebView) findViewById(R.id.main);
         switch (item.getItemId()) {
             case R.id.refresh:
-                WebView myWebView = (WebView) findViewById(R.id.main);
                 if (!DetectConnection.checkInternetConnection(this)) {
                     Toast.makeText(getApplicationContext(), "No Internet! Please enable net and then hit 'Refresh'", Toast.LENGTH_LONG).show();
                     startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
@@ -203,4 +208,5 @@ public class MainActivity extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

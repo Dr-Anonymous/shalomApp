@@ -9,7 +9,7 @@
         android:id="@+id/logo"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="#fffeebff"
+        android:background="#ffffffff"
         android:contentDescription="logo"
         android:src="@drawable/logo" />
 
@@ -17,21 +17,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:background="#fffeebff"
+        android:background="#ffffffff"
         android:contentDescription="@string/about"
         android:gravity="center_horizontal"
         android:text="@string/about"
-        android:textColor="#ff8c1a1c"
+        android:textColor="#ff000000"
         android:textSize="20sp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#fffeebff"
+        android:background="#ffffffff"
         android:gravity="center_horizontal"
         android:text="@string/feedback"
-        android:textColor="#ff8c1a1c"
+        android:textColor="#ff000000"
         android:textSize="15sp" />
 
 </RelativeLayout>

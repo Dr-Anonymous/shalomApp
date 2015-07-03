@@ -14,11 +14,6 @@
         android:title="Share"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/today"
-        android:icon="@drawable/today"
-        android:title="Today!"
-        app:showAsAction="ifRoom" />
-    <item
         android:id="@+id/exit"
         android:icon="@drawable/exit"
         android:title="Exit"

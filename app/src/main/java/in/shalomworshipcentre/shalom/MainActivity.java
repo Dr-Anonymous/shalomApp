@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -23,11 +22,19 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle("");
-
+        setContentView(R.layout.activity_main);
+       /* final String PREFS_NAME = "MyPrefsFile";
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        if (settings.getBoolean("my_first_time", true)) {
+            //the app is being launched for first time, do something
+            Toast.makeText(this, "Hello!\nTap 'Back' button for more options.", Toast.LENGTH_LONG)
+                    .show();
+            // record the fact that the app has been started at least once
+            settings.edit().putBoolean("my_first_time", false).commit();
+        }
         //hide actionbar after delay
-        /*Handler h = new Handler();
+        Handler h = new Handler();
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -44,7 +51,6 @@ public class MainActivity extends ActionBarActivity {
         WebView myWebView = (WebView) findViewById(R.id.main);
         //url loading
         myWebView.loadUrl("http://www.shalomworshipcentre.in");
-
         //Enabling JavaScript
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -54,7 +60,6 @@ public class MainActivity extends ActionBarActivity {
         webSettings.setAppCacheEnabled(true);
         //the way the cache is used
         webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-
         // Function to load all URLs in same webview
         myWebView.setWebViewClient(new WebViewClient());
         //zoom feature
@@ -64,7 +69,7 @@ public class MainActivity extends ActionBarActivity {
         //allow file access-- not sure what it is...
         webSettings.setAllowFileAccess(true);
         //disabling debugging in webview
-        WebView.setWebContentsDebuggingEnabled(false);
+        //WebView.setWebContentsDebuggingEnabled(false);
 
         /** //downloading files using external brweser
          myWebView.setDownloadListener(new DownloadListener() {
@@ -107,6 +112,7 @@ public class MainActivity extends ActionBarActivity {
         // If it wasn't the Back key or there's no web page history, bubble up to the default
         // system behavior (probably exit the activity)
         return super.onKeyDown(keyCode, event);
+
     }
 
     private static final int TIME_INTERVAL = 2000; // # milliseconds, desired time passed between two back presses.
@@ -126,12 +132,13 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        ActionBar actionBar = getSupportActionBar();
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         //hide action bar
+        //ActionBar actionBar = getSupportActionBar();
         //actionBar.hide();
         return true;
+
     }
 
 
@@ -151,17 +158,6 @@ public class MainActivity extends ActionBarActivity {
                             .show();
                     myWebView.clearCache(true);
                     myWebView.reload();
-                }
-                return true;
-            case R.id.today:
-                if (!DetectConnection.checkInternetConnection(this)) {
-                    Toast.makeText(getApplicationContext(), "No Internet! Please enable net and retry", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
-                } else {
-                    Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
-                            .show();
-                    Intent today = new Intent(MainActivity.this, Today.class);
-                    startActivity(today);
                 }
                 return true;
             /**case R.id.downloads:
@@ -208,5 +204,4 @@ public class MainActivity extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

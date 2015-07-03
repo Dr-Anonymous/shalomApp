@@ -8,11 +8,6 @@
         android:title="Refresh"
         app:showAsAction="always" />
     <item
-        android:id="@+id/today"
-        android:icon="@drawable/today"
-        android:title="Today!"
-        app:showAsAction="always" />
-    <item
         android:id="@+id/share"
         android:icon="@drawable/share"
         android:title="Share"

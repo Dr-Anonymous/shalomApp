@@ -34,17 +34,6 @@ public class About extends ActionBarActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
-            case R.id.today:
-                if (!DetectConnection.checkInternetConnection(this)) {
-                    Toast.makeText(getApplicationContext(), "No Internet! Please enable net and retry", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
-                } else {finish();
-                    Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
-                            .show();
-                    Intent today = new Intent(About.this, Today.class);
-                    startActivity(today);
-                }
-                return true;
             case R.id.check:
                 if (!DetectConnection.checkInternetConnection(this)) {
                     Toast.makeText(getApplicationContext(), "No Internet! Please enable net and retry", Toast.LENGTH_LONG).show();

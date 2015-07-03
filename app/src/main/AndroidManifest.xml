@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="in.shalomworshipcentre.shalom">
-    android:versionCode=1.0
-    android:versionName=Genesis
+    android:versionCode="1"
+    android:versionName="Genesis"
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -13,7 +13,6 @@
 
     <application
         android:allowBackup="true"
-        android:debuggable="false"
         android:configChanges="keyboardHidden|orientation|screenSize"
         android:icon="@drawable/appicon"
         android:label="Shalom"
@@ -28,13 +27,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".Today"
-            android:label="Today!"
-            android:parentActivityName=".MainActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize">
-        </activity>
         <activity
             android:name=".About"
             android:label="About"
@@ -48,5 +40,4 @@
             android:configChanges="keyboardHidden|orientation|screenSize">
         </activity>
     </application>
-
 </manifest>

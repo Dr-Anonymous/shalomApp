@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -32,7 +31,7 @@ public class Check extends ActionBarActivity {
 
         WebView myWebView = (WebView) findViewById(R.id.main);
         //url loading
-        myWebView.loadUrl("http://shalomworshipcentre.in/omni/omni/index.html");
+        myWebView.loadUrl("http://shalomworshipcentre.in/appupdate.html");
 
         //Enabling JavaScript
         WebSettings webSettings = myWebView.getSettings();
@@ -53,8 +52,6 @@ public class Check extends ActionBarActivity {
         webSettings.setDisplayZoomControls(false);
         //allow file access-- not sure what it is...
         webSettings.setAllowFileAccess(true);
-        //disabling debugging in webview
-        WebView.setWebContentsDebuggingEnabled(false);
 
         //download using download manager
         myWebView.setDownloadListener(new DownloadListener() {
@@ -93,34 +90,13 @@ public class Check extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        ActionBar actionBar = getSupportActionBar();
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_check, menu);
-
-        //hide action bar
-        //actionBar.hide();
         return true;
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
-            case R.id.today:
-                if (!DetectConnection.checkInternetConnection(this)) {
-                    Toast.makeText(getApplicationContext(), "No Internet! Please enable net and try again", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
-                } else {
-                    Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
-                            .show();
-                    Intent today = new Intent(Check.this, Today.class);
-                    startActivity(today);
-                    finish();
-                }
-                return true;
             case R.id.refresh:
                 Toast.makeText(this, "Refreshing..", Toast.LENGTH_SHORT)
                         .show();

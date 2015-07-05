@@ -6,18 +6,22 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 public class Check extends ActionBarActivity {
+    private ImageView one = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +32,33 @@ public class Check extends ActionBarActivity {
             finish();
             return; // add this to prevent from doing unnecessary stuffs
         }
+        //hide actionbar after delay
+        Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // DO DELAYED STUFF
+                getSupportActionBar().hide();
+            }
+        }, 3000);
+
+
+        one = (ImageView)findViewById(R.id.click);
+        one.setOnClickListener(new View.OnClickListener(){
+
+            public void onClick(View view) {
+                getSupportActionBar().show();
+                Handler h = new Handler();
+                h.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // DO DELAYED STUFF
+                        getSupportActionBar().hide();
+                    }
+                }, 4000);
+
+            }});
+
 
         WebView myWebView = (WebView) findViewById(R.id.main);
         //url loading
@@ -118,8 +149,6 @@ public class Check extends ActionBarActivity {
                 finish();
 
         }
-
-
         return super.onOptionsItemSelected(item);
     }
 

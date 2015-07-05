@@ -5,20 +5,23 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 
 public class MainActivity extends ActionBarActivity {
-
+    private ImageView one = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +35,7 @@ public class MainActivity extends ActionBarActivity {
                     .show();
             // record the fact that the app has been started at least once
             settings.edit().putBoolean("my_first_time", false).commit();
-        }
+        }*/
         //hide actionbar after delay
         Handler h = new Handler();
         h.postDelayed(new Runnable() {
@@ -41,7 +44,25 @@ public class MainActivity extends ActionBarActivity {
                 // DO DELAYED STUFF
                 getSupportActionBar().hide();
             }
-        }, 3000);*/
+        }, 3000);
+
+
+        one = (ImageView)findViewById(R.id.click);
+        one.setOnClickListener(new View.OnClickListener(){
+
+            public void onClick(View view) {
+                getSupportActionBar().show();
+                Handler h = new Handler();
+                h.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // DO DELAYED STUFF
+                        getSupportActionBar().hide();
+                    }
+                }, 4000);
+
+            }});
+
 
         //exit pressed from next activity
         if (getIntent().getBooleanExtra("Exit", false)) {
@@ -138,7 +159,6 @@ public class MainActivity extends ActionBarActivity {
         //ActionBar actionBar = getSupportActionBar();
         //actionBar.hide();
         return true;
-
     }
 
 
@@ -154,7 +174,7 @@ public class MainActivity extends ActionBarActivity {
                     Toast.makeText(getApplicationContext(), "No Internet! Please enable net and then hit 'Refresh'", Toast.LENGTH_LONG).show();
                     startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
                 } else {
-                    Toast.makeText(this, "Refreshing..", Toast.LENGTH_SHORT)
+                    Toast.makeText(this, "Refreshing..", Toast.LENGTH_LONG)
                             .show();
                     myWebView.clearCache(true);
                     myWebView.reload();

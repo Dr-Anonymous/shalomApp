@@ -43,7 +43,7 @@ public class Check extends ActionBarActivity {
         }, 3000);
 
 
-        one = (ImageView)findViewById(R.id.click);
+        one = (ImageView)findViewById(R.id.show);
         one.setOnClickListener(new View.OnClickListener(){
 
             public void onClick(View view) {
@@ -132,7 +132,7 @@ public class Check extends ActionBarActivity {
                 Toast.makeText(this, "Refreshing..", Toast.LENGTH_SHORT)
                         .show();
                 WebView myWebView = (WebView) findViewById(R.id.main);
-                myWebView.reload();
+                myWebView.loadUrl("javascript:window.location.reload( true )");
                 return true;
             case R.id.about:
                 Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)

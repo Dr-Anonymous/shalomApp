@@ -22,20 +22,29 @@ import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
     private ImageView one = null;
+    private ImageView two = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().setTitle("");
+       /* Boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+                .getBoolean("isFirstRun", true);
+
+        if (isFirstRun) {
+            //show start activity
+            startActivity(new Intent(MainActivity.this, First.class));
+        }
+
+
+        getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
+                .putBoolean("isFirstRun", false).commit();
+
+*/
         setContentView(R.layout.activity_main);
-       /* final String PREFS_NAME = "MyPrefsFile";
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-        if (settings.getBoolean("my_first_time", true)) {
-            //the app is being launched for first time, do something
-            Toast.makeText(this, "Hello!\nTap 'Back' button for more options.", Toast.LENGTH_LONG)
-                    .show();
-            // record the fact that the app has been started at least once
-            settings.edit().putBoolean("my_first_time", false).commit();
-        }*/
+        if (!DetectConnection.checkInternetConnection(this)) {
+        } else {
+            Toast.makeText(getApplicationContext(), "Hit 'Refresh' to fetch new data", Toast.LENGTH_LONG).show();
+        }
         //hide actionbar after delay
         Handler h = new Handler();
         h.postDelayed(new Runnable() {
@@ -45,30 +54,39 @@ public class MainActivity extends ActionBarActivity {
                 getSupportActionBar().hide();
             }
         }, 3000);
-
-
-        one = (ImageView)findViewById(R.id.click);
-        one.setOnClickListener(new View.OnClickListener(){
+        one = (ImageView) findViewById(R.id.show);
+        one.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View view) {
                 getSupportActionBar().show();
+                one.setVisibility(View.GONE);
+                two.setVisibility(View.VISIBLE);
+            }
+        });
+        two = (ImageView) findViewById(R.id.hide);
+        two.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View view) {
+                getSupportActionBar().hide();
+                one.setVisibility(View.VISIBLE);
+                two.setVisibility(View.GONE);
                 Handler h = new Handler();
                 h.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        // DO DELAYED STUFF
                         getSupportActionBar().hide();
+                        one.setVisibility(View.VISIBLE);
+                        two.setVisibility(View.GONE);
                     }
-                }, 4000);
-
-            }});
-
-
+                }, 6000);
+            }
+        });
         //exit pressed from next activity
         if (getIntent().getBooleanExtra("Exit", false)) {
             finish();
             return; // add this to prevent from doing unnecessary stuffs
         }
+
         WebView myWebView = (WebView) findViewById(R.id.main);
         //url loading
         myWebView.loadUrl("http://www.shalomworshipcentre.in");
@@ -176,8 +194,7 @@ public class MainActivity extends ActionBarActivity {
                 } else {
                     Toast.makeText(this, "Refreshing..", Toast.LENGTH_LONG)
                             .show();
-                    myWebView.clearCache(true);
-                    myWebView.reload();
+                    myWebView.loadUrl("javascript:window.location.reload( true )");
                 }
                 return true;
             /**case R.id.downloads:

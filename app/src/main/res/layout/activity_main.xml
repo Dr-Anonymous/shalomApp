@@ -10,12 +10,22 @@
         android:layout_height="fill_parent"></WebView>
 
     <ImageView
-        android:id="@+id/click"
+        android:id="@+id/show"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:paddingBottom="15dp"
         android:layout_alignParentBottom="true"
-        android:onClick="click"
-        android:src="@drawable/menu" />
+        android:layout_centerInParent="true"
+        android:hapticFeedbackEnabled="true"
+        android:paddingBottom="5dp"
+        android:src="@drawable/dwn" />
+
+    <ImageView
+        android:id="@+id/hide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:paddingBottom="5dp"
+        android:src="@drawable/up"
+        android:visibility="gone" />
 </RelativeLayout>

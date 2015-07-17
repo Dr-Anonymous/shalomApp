@@ -19,7 +19,11 @@ public class About extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         ActionBar actionBar = getSupportActionBar();
+        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_about, menu);
+
+        //hide action bar
+        //actionBar.hide();
         return true;
     }
 
@@ -33,6 +37,7 @@ public class About extends ActionBarActivity {
             case R.id.check:
                 if (!DetectConnection.checkInternetConnection(this)) {
                     Toast.makeText(getApplicationContext(), "No Internet! Please enable net and retry", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
                 } else {
                     Toast.makeText(this, "Checking for Update..", Toast.LENGTH_SHORT)
                             .show();

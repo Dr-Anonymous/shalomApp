@@ -1,8 +1,10 @@
 package in.shalomworshipcentre.shalom;
 
+import android.app.DownloadManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
@@ -25,16 +27,24 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().setTitle("");
        /* Boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
                 .getBoolean("isFirstRun", true);
+
         if (isFirstRun) {
+            //show start activity
+            startActivity(new Intent(MainActivity.this, First.class));
+        }
+
+
+        getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
+                .putBoolean("isFirstRun", false).commit();
+
+*/
+        setContentView(R.layout.activity_main);
+        if (!DetectConnection.checkInternetConnection(this)) {
+        } else {
             Toast.makeText(getApplicationContext(), "Hit 'Refresh' to fetch new data", Toast.LENGTH_LONG).show();
         }
-        getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
-                .putBoolean("isFirstRun", false).commit();*/
-
-        setContentView(R.layout.activity_main);
         //hide actionbar after delay
         Handler h = new Handler();
         h.postDelayed(new Runnable() {
@@ -51,15 +61,6 @@ public class MainActivity extends ActionBarActivity {
                 getSupportActionBar().show();
                 one.setVisibility(View.GONE);
                 two.setVisibility(View.VISIBLE);
-                Handler h = new Handler();
-                h.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        getSupportActionBar().hide();
-                        one.setVisibility(View.VISIBLE);
-                        two.setVisibility(View.GONE);
-                    }
-                }, 7000);
             }
         });
         two = (ImageView) findViewById(R.id.hide);
@@ -69,6 +70,15 @@ public class MainActivity extends ActionBarActivity {
                 getSupportActionBar().hide();
                 one.setVisibility(View.VISIBLE);
                 two.setVisibility(View.GONE);
+                Handler h = new Handler();
+                h.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSupportActionBar().hide();
+                        one.setVisibility(View.VISIBLE);
+                        two.setVisibility(View.GONE);
+                    }
+                }, 6000);
             }
         });
         //exit pressed from next activity
@@ -76,51 +86,43 @@ public class MainActivity extends ActionBarActivity {
             finish();
             return; // add this to prevent from doing unnecessary stuffs
         }
+
         WebView myWebView = (WebView) findViewById(R.id.main);
+        //url loading
+        myWebView.loadUrl("http://www.shalomworshipcentre.in");
         //Enabling JavaScript
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         //chrome client
         myWebView.setWebChromeClient(new WebChromeClient());
-        //cache path
-        webSettings.setAppCachePath(getApplicationContext().getCacheDir().getAbsolutePath());
-        //allow file access
-        webSettings.setAllowFileAccess(true);
         //cache enabled
         webSettings.setAppCacheEnabled(true);
-        // load online by default
-        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        if (!DetectConnection.checkInternetConnection(this)) {// loading offline
-            webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        }
-        myWebView.loadUrl("http://www.shalomworshipcentre.in");
-        //HTML5 localstorage feature
-        webSettings.setDomStorageEnabled(true);
+        //the way the cache is used
+        webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         // Function to load all URLs in same webview
         myWebView.setWebViewClient(new WebViewClient());
-
-       /* File dir = this.getCacheDir();
-        if (dir == null && DetectConnection.checkInternetConnection(this)) {
-            myWebView.loadUrl("http://www.shalomworshipcentre.in");
-        } else {
-            Toast.makeText(getApplicationContext(), "Offline version", Toast.LENGTH_SHORT).show();
-            myWebView.loadUrl("file:///android_asset/index.html");
-
-        }*/
+        //zoom feature
         webSettings.setBuiltInZoomControls(true);
+        // dont show zoom controls
         webSettings.setDisplayZoomControls(false);
-        //downloading files using external browser
+        //allow file access-- not sure what it is...
+        webSettings.setAllowFileAccess(true);
+        //disabling debugging in webview
+        //WebView.setWebContentsDebuggingEnabled(false);
+
+        /** //downloading files using external brweser
          myWebView.setDownloadListener(new DownloadListener() {
-             public void onDownloadStart(String url, String userAgent,
-                                         String contentDisposition, String mimetype,
-                                         long contentLength) {
-                 Intent i = new Intent(Intent.ACTION_VIEW);
-                 i.setData(Uri.parse(url));
-                 startActivity(i);
-             }
-         });
+         public void onDownloadStart(String url, String userAgent,
+         String contentDisposition, String mimetype,
+         long contentLength) {
+         Intent i = new Intent(Intent.ACTION_VIEW);
+         i.setData(Uri.parse(url));
+         startActivity(i);
+         }
+         }); */
+
         //download using download manager
-       /* myWebView.setDownloadListener(new DownloadListener() {
+        myWebView.setDownloadListener(new DownloadListener() {
             public void onDownloadStart(String url, String userAgent,
                                         String contentDisposition, String mimetype,
                                         long contentLength) {
@@ -128,22 +130,26 @@ public class MainActivity extends ActionBarActivity {
                         Uri.parse(url));
                 request.allowScanningByMediaScanner();
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Shalom.mp3");
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Shalom_Messages");
                 DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
                 dm.enqueue(request);
 
             }
-        });*/
+        });
 
     }
 
+    // Navigating web page history by clicking back button
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         WebView myWebView = (WebView) findViewById(R.id.main);
+        // Check if the key event was the Back button and if there's history
         if ((keyCode == KeyEvent.KEYCODE_BACK) && myWebView.canGoBack()) {
             myWebView.goBack();
             return true;
         }
+        // If it wasn't the Back key or there's no web page history, bubble up to the default
+        // system behavior (probably exit the activity)
         return super.onKeyDown(keyCode, event);
 
     }
@@ -165,30 +171,39 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        //hide action bar
+        //ActionBar actionBar = getSupportActionBar();
+        //actionBar.hide();
         return true;
     }
 
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
         WebView myWebView = (WebView) findViewById(R.id.main);
         switch (item.getItemId()) {
             case R.id.refresh:
                 if (!DetectConnection.checkInternetConnection(this)) {
                     Toast.makeText(getApplicationContext(), "No Internet! Please enable net and then hit 'Refresh'", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
                 } else {
-                    Toast.makeText(this, "Refreshing..", Toast.LENGTH_LONG).show();
-                    myWebView.reload();
+                    Toast.makeText(this, "Refreshing..", Toast.LENGTH_LONG)
+                            .show();
+                    myWebView.loadUrl("javascript:window.location.reload( true )");
                 }
                 return true;
-           /* case R.id.downloads:
-             Uri uri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
-                    + "");
-             Intent open = new Intent(Intent.ACTION_VIEW);
-              open.setDataAndType(uri, "audio/mpeg");
-              startActivity(Intent.createChooser(open, "Open downloaded files"));
-             return true;*/
+            /**case R.id.downloads:
+             * * Uri uri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
+             *        + "");
+             *Intent open = new Intent(Intent.ACTION_VIEW);
+             * *open.setDataAndType(uri, "enter file mime type here");
+             * startActivity(Intent.createChooser(open, "Open downloaded files"));
+             return true; */
             case R.id.about:
                 Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
                         .show();
@@ -214,6 +229,12 @@ public class MainActivity extends ActionBarActivity {
                 startActivity(restart);
                 finish();
                 return true;
+            /*case R.id.home:
+                Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                return true;*/
             case R.id.exit:
                 finish();
 

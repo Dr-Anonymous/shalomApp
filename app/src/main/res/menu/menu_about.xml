@@ -2,12 +2,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
-
-    <item
-        android:id="@+id/check"
-        android:icon="@drawable/update"
-        android:title="Check For Update"
-        app:showAsAction="always|withText" />
     <item
         android:id="@+id/share"
         android:icon="@drawable/share"

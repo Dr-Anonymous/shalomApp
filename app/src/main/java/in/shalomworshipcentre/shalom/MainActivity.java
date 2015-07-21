@@ -1,13 +1,12 @@
 package in.shalomworshipcentre.shalom;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
@@ -18,14 +17,27 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.parse.ParseException;
+import com.parse.SaveCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class MainActivity extends ActionBarActivity {
     private ImageView one = null;
     private ImageView two = null;
+    private ImageView a = null;
+    private ImageView b = null;
+    private ImageView c = null;
+    private ImageView d = null;
+    private ImageView e = null;
+    public Todo todo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().setTitle("");
+        getSupportActionBar().hide();
       /*  Boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
                 .getBoolean("isFirstRun", true);
         if (isFirstRun) {
@@ -33,58 +45,111 @@ public class MainActivity extends ActionBarActivity {
         }
         getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
                 .putBoolean("isFirstRun", false).commit();*/
-
         setContentView(R.layout.activity_main);
-        //hide actionbar after delay
-        Handler h = new Handler();
+        final WebView myWebView = (WebView) findViewById(R.id.main);
+
+      /*  Handler h = new Handler();
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
                 // DO DELAYED STUFF
-                getSupportActionBar().hide();
             }
-        }, 3000);
+        }, 3000);*/
         one = (ImageView) findViewById(R.id.show);
         one.setOnClickListener(new View.OnClickListener() {
-
             public void onClick(View view) {
-                getSupportActionBar().show();
-                one.setVisibility(View.GONE);
+                one.setVisibility(View.INVISIBLE);
                 two.setVisibility(View.VISIBLE);
-                Handler h = new Handler();
-                h.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        getSupportActionBar().hide();
-                        one.setVisibility(View.VISIBLE);
-                        two.setVisibility(View.GONE);
-                    }
-                }, 7000);
+                a.setVisibility(View.VISIBLE);
+                b.setVisibility(View.VISIBLE);
+                c.setVisibility(View.VISIBLE);
+                d.setVisibility(View.VISIBLE);
+                e.setVisibility(View.VISIBLE);
             }
         });
         two = (ImageView) findViewById(R.id.hide);
         two.setOnClickListener(new View.OnClickListener() {
-
             public void onClick(View view) {
-                getSupportActionBar().hide();
+                two.setVisibility(View.INVISIBLE);
+                a.setVisibility(View.INVISIBLE);
+                b.setVisibility(View.INVISIBLE);
+                c.setVisibility(View.INVISIBLE);
+                d.setVisibility(View.INVISIBLE);
+                e.setVisibility(View.INVISIBLE);
                 one.setVisibility(View.VISIBLE);
-                two.setVisibility(View.GONE);
             }
         });
+        a = (ImageView) findViewById(R.id.a);
+        a.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Intent about = new Intent(MainActivity.this, About.class);
+                startActivity(about);
+            }
+        });
+        b = (ImageView) findViewById(R.id.b);
+        b.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Intent notif = new Intent(MainActivity.this, Notif.class);
+                startActivity(notif);
+            }
+        });
+        c = (ImageView) findViewById(R.id.c);
+        c.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                if (!DetectConnection.checkInternetConnection(MainActivity.this)) {
+                    Toast.makeText(MainActivity.this, "Offline - Reload", Toast.LENGTH_SHORT).show();
+                    Intent mStartActivity = new Intent(MainActivity.this, MainActivity.class);
+                    finish();
+                    startActivity(mStartActivity);
+
+                } else {
+                    Toast.makeText(MainActivity.this, "Refreshing..", Toast.LENGTH_LONG).show();
+                    myWebView.reload();
+                }
+            }
+        });
+        d = (ImageView) findViewById(R.id.d);
+        d.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Intent share = new Intent();
+                share.setAction(Intent.ACTION_SEND);
+                String Url = myWebView.getUrl();
+                share.putExtra(Intent.EXTRA_TEXT, Url);
+                share.setType("text/plain");
+                startActivity(share);
+            }
+        });
+        e = (ImageView) findViewById(R.id.e);
+        e.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         //exit pressed from next activity
         if (getIntent().getBooleanExtra("Exit", false)) {
             finish();
             return; // add this to prevent from doing unnecessary stuffs
         }
-        WebView myWebView = (WebView) findViewById(R.id.main);
         //Enabling JavaScript
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        webSettings.setSupportMultipleWindows(true);
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
         //chrome client
-        myWebView.setWebChromeClient(new WebChromeClient());
+        myWebView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onCreateWindow(WebView view, boolean dialog, boolean userGesture, Message resultMsg) {
+                WebView newWebView = new WebView(MainActivity.this);
+                //addView(newWebView);
+                WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+                transport.setWebView(newWebView);
+                resultMsg.sendToTarget();
+                return true;
+            }
+        });
         //cache path
         webSettings.setAppCachePath(getApplicationContext().getCacheDir().getAbsolutePath());
         //allow file access
@@ -125,10 +190,46 @@ public class MainActivity extends ActionBarActivity {
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                 request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Shalom.mp3");
                 DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-                dm.enqueue(request);
+                dm.enqueue(request);}});*/
+        // parse code
+        try {
+            Intent intent = getIntent();
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                String jsonData = extras.getString("com.parse.Data");
+                JSONObject json;
+                json = new JSONObject(jsonData);
+                String pushStore = json.getString("alert");
+                //data.setText(pushStore);
+                Toast.makeText(getBaseContext(), "New Message", Toast.LENGTH_SHORT).show();
+                final Intent a = new Intent(MainActivity.this, Notif.class);
+                //a.putExtra(EXTRA_MESSAGE, pushStore);
+                startActivity(a);
 
+
+                todo = new Todo();
+                todo.setUuidString();
+
+                todo.setTitle(pushStore);
+                todo.setDraft(true);
+                todo.pinInBackground(Application.TODO_GROUP_NAME,
+                        new SaveCallback() {
+
+                            @Override
+                            public void done(ParseException e) {
+                                if (isFinishing()) {
+                                    return;
+                                }
+                                if (e == null) {
+                                    setResult(Activity.RESULT_OK);
+                                    //  then start notif activity
+                                } else {
+                                }
+                            }
+                        });
             }
-        });*/
+        } catch (JSONException e) {
+        }
     }
 
     @Override
@@ -138,8 +239,27 @@ public class MainActivity extends ActionBarActivity {
             myWebView.goBack();
             return true;
         }
-        return super.onKeyDown(keyCode, event);
+        if (keyCode == KeyEvent.KEYCODE_MENU) {
+            if (one.getVisibility() == View.VISIBLE) {
+                one.setVisibility(View.INVISIBLE);
+                two.setVisibility(View.VISIBLE);
+                a.setVisibility(View.VISIBLE);
+                b.setVisibility(View.VISIBLE);
+                c.setVisibility(View.VISIBLE);
+                d.setVisibility(View.VISIBLE);
+                e.setVisibility(View.VISIBLE);
+            } else {
+                two.setVisibility(View.INVISIBLE);
+                a.setVisibility(View.INVISIBLE);
+                b.setVisibility(View.INVISIBLE);
+                c.setVisibility(View.INVISIBLE);
+                d.setVisibility(View.INVISIBLE);
+                e.setVisibility(View.INVISIBLE);
+                one.setVisibility(View.VISIBLE);
+            }
 
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     private static final int TIME_INTERVAL = 2000; // # milliseconds, desired time passed between two back presses.
@@ -155,63 +275,13 @@ public class MainActivity extends ActionBarActivity {
         }
         mBackPressed = System.currentTimeMillis();
     }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        WebView myWebView = (WebView) findViewById(R.id.main);
-        switch (item.getItemId()) {
-            case R.id.refresh:
-                if (!DetectConnection.checkInternetConnection(this)) {
-                    Toast.makeText(getApplicationContext(), "No Internet! Please enable net and then hit 'Refresh'", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(this, "Refreshing..", Toast.LENGTH_LONG).show();
-                    myWebView.reload();
-                }
-                return true;
-           /* case R.id.downloads:
+        /* case R.id.downloads:
              Uri uri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
                     + "");
              Intent open = new Intent(Intent.ACTION_VIEW);
               open.setDataAndType(uri, "audio/mpeg");
               startActivity(Intent.createChooser(open, "Open downloaded files"));
-             return true;*/
-            case R.id.about:
-                Toast.makeText(this, "Opening..", Toast.LENGTH_SHORT)
-                        .show();
-                Intent about = new Intent(MainActivity.this, About.class);
-                startActivity(about);
-                return true;
-            case R.id.share:
-                Intent share = new Intent();
-                share.setAction(Intent.ACTION_SEND);
-                share.putExtra(Intent.EXTRA_TEXT,
-                        "Hey check out this app at: http://shalomworshipcentre.in/app.html");
-                share.setType("text/plain");
-                startActivity(share);
-                return true;
-            case R.id.screenshot:
-                ShareScreenshot ss = new ShareScreenshot(MainActivity.this);
-                ss.shareImage();
-                return true;
-            case R.id.restart:
-                Toast.makeText(this, "Clean slate..", Toast.LENGTH_SHORT)
-                        .show();
-                Intent restart = new Intent(MainActivity.this, MainActivity.class);
-                startActivity(restart);
-                finish();
-                return true;
+             return true;
             case R.id.exit:
-                finish();
-
-        }
-        return super.onOptionsItemSelected(item);
-    }
+                finish();}return super.onOptionsItemSelected(item);}*/
 }

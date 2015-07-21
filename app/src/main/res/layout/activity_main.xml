@@ -7,7 +7,9 @@
     <WebView
         android:id="@+id/main"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"></WebView>
+        android:layout_height="fill_parent">
+
+    </WebView>
 
     <ImageView
         android:id="@+id/show"
@@ -15,17 +17,70 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
-        android:hapticFeedbackEnabled="true"
         android:paddingBottom="5dp"
-        android:src="@drawable/dwn" />
+        android:src="@drawable/up" />
 
     <ImageView
-        android:id="@+id/hide"
+        android:id="@+id/c"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
         android:paddingBottom="5dp"
-        android:src="@drawable/up"
-        android:visibility="gone" />
+        android:src="@drawable/refreshb"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/a"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="25dp"
+        android:layout_toLeftOf="@+id/b"
+        android:paddingBottom="5dp"
+        android:src="@drawable/aboutb"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/b"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="25dp"
+        android:layout_toLeftOf="@+id/c"
+        android:paddingBottom="5dp"
+        android:src="@drawable/notif"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/d"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="25dp"
+        android:layout_toRightOf="@+id/c"
+        android:paddingBottom="5dp"
+        android:src="@drawable/shareb"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/e"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="25dp"
+        android:layout_toRightOf="@+id/d"
+        android:paddingBottom="5dp"
+        android:src="@drawable/exitb"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/hide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/c"
+        android:layout_centerInParent="true"
+        android:paddingBottom="5dp"
+        android:src="@drawable/dwn"
+        android:visibility="invisible" />
 </RelativeLayout>

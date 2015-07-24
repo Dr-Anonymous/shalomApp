@@ -23,7 +23,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/loggedin_info"
-        android:dividerHeight="10dp"></ListView>
+        android:dividerHeight="10dp">
+
+    </ListView>
 
     <LinearLayout
         android:id="@+id/no_todos_view"
@@ -51,7 +53,7 @@
         android:layout_margin="5dp"
         android:background="#ff898989"
         android:onClick="clear"
-        android:text=" Delete All "
+        android:text=" Clear All "
         android:textColor="#ffffffff" />
 
 </RelativeLayout>

@@ -16,12 +16,9 @@ import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 
 public class Notif extends Activity {
-
     // Adapter for the Todos Parse Query
     private ParseQueryAdapter<Todo> todoListAdapter;
-
     private LayoutInflater inflater;
-
     // For showing empty and non-empty todo views
     private ListView todoListView;
     private LinearLayout noTodosView;

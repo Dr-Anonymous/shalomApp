@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -139,16 +138,11 @@ public class MainActivity extends ActionBarActivity {
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
         //chrome client
-        myWebView.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public boolean onCreateWindow(WebView view, boolean dialog, boolean userGesture, Message resultMsg) {
-                WebView newWebView = new WebView(MainActivity.this);
-                //addView(newWebView);
-                WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
-                transport.setWebView(newWebView);
-                resultMsg.sendToTarget();
-                return true;
-            }
+        myWebView.setWebChromeClient(new WebChromeClient());
+        // Function to load all URLs in same webview
+        myWebView.setWebViewClient(new WebViewClient() {
+
+
         });
         //cache path
         webSettings.setAppCachePath(getApplicationContext().getCacheDir().getAbsolutePath());
@@ -161,14 +155,13 @@ public class MainActivity extends ActionBarActivity {
         if (!DetectConnection.checkInternetConnection(this)) {// loading offline
             webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         }
-        myWebView.loadUrl("http://www.shalomworshipcentre.in");
         //HTML5 localstorage feature
         webSettings.setDomStorageEnabled(true);
-        // Function to load all URLs in same webview
-        myWebView.setWebViewClient(new WebViewClient());
         //zoom
         webSettings.setBuiltInZoomControls(true);
         webSettings.setDisplayZoomControls(false);
+        myWebView.loadUrl("http://www.shalomworshipcentre.in");
+
         //downloading files using external browser
         myWebView.setDownloadListener(new DownloadListener() {
             public void onDownloadStart(String url, String userAgent,
@@ -201,15 +194,12 @@ public class MainActivity extends ActionBarActivity {
                 json = new JSONObject(jsonData);
                 String pushStore = json.getString("alert");
                 //data.setText(pushStore);
-                Toast.makeText(getBaseContext(), "New Message", Toast.LENGTH_SHORT).show();
                 final Intent a = new Intent(MainActivity.this, Notif.class);
                 //a.putExtra(EXTRA_MESSAGE, pushStore);
                 startActivity(a);
 
-
                 todo = new Todo();
                 todo.setUuidString();
-
                 todo.setTitle(pushStore);
                 todo.setDraft(true);
                 todo.pinInBackground(Application.TODO_GROUP_NAME,
@@ -236,6 +226,15 @@ public class MainActivity extends ActionBarActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         WebView myWebView = (WebView) findViewById(R.id.main);
         if ((keyCode == KeyEvent.KEYCODE_BACK) && myWebView.canGoBack()) {
+            if (one.getVisibility() == View.INVISIBLE) {
+                two.setVisibility(View.INVISIBLE);
+                a.setVisibility(View.INVISIBLE);
+                b.setVisibility(View.INVISIBLE);
+                c.setVisibility(View.INVISIBLE);
+                d.setVisibility(View.INVISIBLE);
+                e.setVisibility(View.INVISIBLE);
+                one.setVisibility(View.VISIBLE);
+            }
             myWebView.goBack();
             return true;
         }
@@ -271,7 +270,7 @@ public class MainActivity extends ActionBarActivity {
             super.onBackPressed();
             return;
         } else {
-            Toast.makeText(getBaseContext(), "Tap 'Back' once more to exit", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getBaseContext(), "Tap once more to exit", Toast.LENGTH_SHORT).show();
         }
         mBackPressed = System.currentTimeMillis();
     }

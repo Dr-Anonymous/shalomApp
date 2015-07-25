@@ -4,15 +4,18 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -32,6 +35,8 @@ public class MainActivity extends ActionBarActivity {
     private ImageView d = null;
     private ImageView e = null;
     public Todo todo;
+    private FrameLayout mContainer;
+    private WebView mWebviewPop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +51,8 @@ public class MainActivity extends ActionBarActivity {
                 .putBoolean("isFirstRun", false).commit();*/
         setContentView(R.layout.activity_main);
         final WebView myWebView = (WebView) findViewById(R.id.main);
-
+        mContainer = (FrameLayout) findViewById(R.id.webview_frame);
+        mWebviewPop = (WebView) findViewById(R.id.webviewPop);
       /*  Handler h = new Handler();
         h.postDelayed(new Runnable() {
             @Override
@@ -138,12 +144,9 @@ public class MainActivity extends ActionBarActivity {
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
         //chrome client
-        myWebView.setWebChromeClient(new WebChromeClient());
+        myWebView.setWebChromeClient(new UriChromeClient());
         // Function to load all URLs in same webview
-        myWebView.setWebViewClient(new WebViewClient() {
-
-
-        });
+        myWebView.setWebViewClient(new UriWebViewClient());
         //cache path
         webSettings.setAppCachePath(getApplicationContext().getCacheDir().getAbsolutePath());
         //allow file access
@@ -212,13 +215,55 @@ public class MainActivity extends ActionBarActivity {
                                 }
                                 if (e == null) {
                                     setResult(Activity.RESULT_OK);
-                                    //  then start notif activity
-                                } else {
                                 }
                             }
                         });
             }
         } catch (JSONException e) {
+        }
+    }
+
+    private class UriWebViewClient extends WebViewClient {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            String host = Uri.parse(url).getHost();
+            if (host.contains("shalomworshipcentre.in")) {
+                // This is my web site, so do not override; let my WebView load
+                if (mWebviewPop != null) {
+                    mWebviewPop.setVisibility(View.GONE);
+                    mContainer.removeView(mWebviewPop);
+                    mWebviewPop = null;
+                }
+                return false;
+            }
+            if (host.contains("facebook")) {
+                return false;
+            }
+            // Otherwise, the link is not for a page on my site
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+            return true;
+        }
+    }
+
+    class UriChromeClient extends WebChromeClient {
+
+        @Override
+        public boolean onCreateWindow(WebView view, boolean isDialog,
+                                      boolean isUserGesture, Message resultMsg) {
+            mWebviewPop = new WebView(MainActivity.this);
+            WebSettings webSettings = mWebviewPop.getSettings();
+            webSettings.setBuiltInZoomControls(true);
+            webSettings.setDisplayZoomControls(false);
+            mWebviewPop.setWebViewClient(new UriWebViewClient());
+            webSettings.setJavaScriptEnabled(true);
+            mWebviewPop.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+            mContainer.addView(mWebviewPop);
+            WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+            transport.setWebView(mWebviewPop);
+            resultMsg.sendToTarget();
+            return true;
         }
     }
 
@@ -237,6 +282,13 @@ public class MainActivity extends ActionBarActivity {
             }
             myWebView.goBack();
             return true;
+        }
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (mWebviewPop != null) {
+                mWebviewPop.setVisibility(View.GONE);
+                mContainer.removeView(mWebviewPop);
+                mWebviewPop = null;
+            }
         }
         if (keyCode == KeyEvent.KEYCODE_MENU) {
             if (one.getVisibility() == View.VISIBLE) {
@@ -283,4 +335,5 @@ public class MainActivity extends ActionBarActivity {
              return true;
             case R.id.exit:
                 finish();}return super.onOptionsItemSelected(item);}*/
+
 }

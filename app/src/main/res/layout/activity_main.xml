@@ -4,12 +4,20 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <WebView
-        android:id="@+id/main"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+    <FrameLayout
+        android:id="@+id/webview_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <WebView
+            android:id="@+id/webviewPop"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"></WebView>
 
-    </WebView>
+        <WebView
+            android:id="@+id/main"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"></WebView>
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/show"

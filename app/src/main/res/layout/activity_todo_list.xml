@@ -55,5 +55,4 @@
         android:onClick="clear"
         android:text=" Clear All "
         android:textColor="#ffffffff" />
-
 </RelativeLayout>

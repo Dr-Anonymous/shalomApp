@@ -15,8 +15,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:background="#ffffffff"
+        android:layout_marginBottom="15dp"
+        android:background="#d1ffffff"
         android:contentDescription="@string/about"
         android:fontFamily="sans-serif-light"
         android:gravity="center_horizontal|center_vertical"
@@ -26,10 +26,12 @@
         android:textStyle="italic" />
 
     <TextView
+        android:id="@+id/txt2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/btn"
-        android:background="#ffffffff"
+        android:layout_above="@+id/mySwitch"
+        android:layout_marginBottom="15dp"
+        android:background="#d1ffffff"
         android:gravity="center_horizontal|center_vertical"
         android:text="@string/feedback"
         android:textColor="#ff000000"
@@ -41,10 +43,68 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
-        android:background="#ff818181"
-        android:gravity="center_horizontal|center_vertical"
+        android:layout_margin="5dp"
+        android:background="#8a676767"
         android:onClick="check"
-        android:text="Check for updates"
+        android:text="updates"
         android:textColor="#ffffff" />
+
+    <Button
+        android:id="@+id/help"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="5dp"
+        android:background="#8a676767"
+        android:onClick="help"
+        android:text="How to??"
+        android:textColor="#ffffff" />
+
+    <Button
+        android:id="@+id/share"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="5dp"
+        android:background="#8a676767"
+        android:onClick="share"
+        android:text="share app"
+        android:textColor="#ffffff" />
+
+    <Switch
+        android:id="@+id/mySwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/txt3"
+        android:layout_centerInParent="true"
+        android:background="#d1ffffff"
+        android:text="smartHome"
+        android:textColor="#ff000000"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/txt3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btn"
+        android:background="#d1ffffff"
+        android:gravity="center_horizontal|center_vertical"
+        android:text="@string/smart"
+        android:textColor="#ff000000"
+        android:textSize="15sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@+id/btn"
+        android:background="#000000"></View>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@+id/mySwitch"
+        android:background="#000000"></View>
 
 </RelativeLayout>

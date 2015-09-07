@@ -53,6 +53,11 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="Notifications"
             android:parentActivityName=".MainActivity"></activity>
+        <activity
+            android:name=".New"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="New"
+            android:parentActivityName=".MainActivity"></activity>
 
         <service android:name="com.parse.PushService" />
 

@@ -2,10 +2,13 @@ package in.shalomworshipcentre.shalom;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +20,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.parse.ParseException;
@@ -36,21 +40,35 @@ public class MainActivity extends ActionBarActivity {
     private ImageView e = null;
     public Todo todo;
     private FrameLayout mContainer;
+    private WebView myWebView;
     private WebView mWebviewPop;
+    public static String homeUrl;
+    private ProgressBar progress;
+    String settingsTAG;
+    SharedPreferences prefs;
+    boolean rb0;
+    WebSettings webSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
-      /*  Boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+
+        //show help screen on first run
+        Boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
                 .getBoolean("isFirstRun", true);
         if (isFirstRun) {
-            Toast.makeText(getApplicationContext(), "Hit 'Refresh' to fetch new data", Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, "Hi there !", Toast.LENGTH_SHORT).show();
+            Intent first = new Intent(MainActivity.this, New.class);
+            startActivity(first);
         }
         getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
-                .putBoolean("isFirstRun", false).commit();*/
-        setContentView(R.layout.activity_main);
-        final WebView myWebView = (WebView) findViewById(R.id.main);
+                .putBoolean("isFirstRun", false).commit();
+
+
+        setContentView(R.layout.activity_main);//layout
+        // layout initialising
+        myWebView = (WebView) findViewById(R.id.main);
         mContainer = (FrameLayout) findViewById(R.id.webview_frame);
         mWebviewPop = (WebView) findViewById(R.id.webviewPop);
       /*  Handler h = new Handler();
@@ -87,6 +105,7 @@ public class MainActivity extends ActionBarActivity {
         a = (ImageView) findViewById(R.id.a);
         a.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+                Toast.makeText(getBaseContext(), "About.. ", Toast.LENGTH_SHORT).show();
                 Intent about = new Intent(MainActivity.this, About.class);
                 startActivity(about);
             }
@@ -119,7 +138,7 @@ public class MainActivity extends ActionBarActivity {
                 Intent share = new Intent();
                 share.setAction(Intent.ACTION_SEND);
                 String Url = myWebView.getUrl();
-                share.putExtra(Intent.EXTRA_TEXT, Url);
+                share.putExtra(Intent.EXTRA_TEXT, "Hey! check out " + Url);
                 share.setType("text/plain");
                 startActivity(share);
             }
@@ -131,13 +150,34 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        //exit pressed from next activity
-        if (getIntent().getBooleanExtra("Exit", false)) {
-            finish();
-            return; // add this to prevent from doing unnecessary stuffs
+        settingsTAG = "AppSettings";
+        prefs = getSharedPreferences(settingsTAG, 0);
+        rb0 = prefs.getBoolean("rb0", false);
+        if (rb0) {
+            homeUrl = "http://shalomworshipcentre.in/mobile.html";
+        } else {
+            homeUrl = "http://shalomworshipcentre.in";
+
         }
+
+        //intent passed from about activity
+        if (getIntent().getBooleanExtra("on", false)) {
+            Toast.makeText(MainActivity.this, "smartHome on", Toast.LENGTH_SHORT).show();
+            Intent mStartActivity = new Intent(MainActivity.this, MainActivity.class);
+            finish();
+            startActivity(mStartActivity);
+            return; // add this to prevent from doing unnecessary stuffs
+
+        }
+        if (getIntent().getBooleanExtra("off", false)) {
+            Intent mStartActivity = new Intent(MainActivity.this, MainActivity.class);
+            finish();
+            startActivity(mStartActivity);
+            return;
+        }
+
         //Enabling JavaScript
-        WebSettings webSettings = myWebView.getSettings();
+        webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webSettings.setSupportMultipleWindows(true);
@@ -145,10 +185,10 @@ public class MainActivity extends ActionBarActivity {
         cookieManager.setAcceptCookie(true);
         //chrome client
         myWebView.setWebChromeClient(new UriChromeClient());
-        // Function to load all URLs in same webview
+        // Function to load URLs in same webview
         myWebView.setWebViewClient(new UriWebViewClient());
-        //cache path
-        webSettings.setAppCachePath(getApplicationContext().getCacheDir().getAbsolutePath());
+        //cache path ---
+        //webSettings.setAppCachePath(getApplicationContext().getCacheDir().getAbsolutePath());
         //allow file access
         webSettings.setAllowFileAccess(true);
         //cache enabled
@@ -163,7 +203,13 @@ public class MainActivity extends ActionBarActivity {
         //zoom
         webSettings.setBuiltInZoomControls(true);
         webSettings.setDisplayZoomControls(false);
-        myWebView.loadUrl("http://www.shalomworshipcentre.in");
+
+        // progress bar
+        progress = (ProgressBar) findViewById(R.id.progressBar);
+        progress.setVisibility(View.GONE);
+
+        // load the url
+        myWebView.loadUrl(homeUrl);
 
         //downloading files using external browser
         myWebView.setDownloadListener(new DownloadListener() {
@@ -236,18 +282,48 @@ public class MainActivity extends ActionBarActivity {
                 }
                 return false;
             }
+            if ((host.contains("facebook")) && rb0) {
+                view.loadUrl("https://m.facebook.com/shalomworshipcentre.kkd");
+                return false;
+            }
             if (host.contains("facebook")) {
                 return false;
             }
+
             // Otherwise, the link is not for a page on my site
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             startActivity(intent);
             return true;
         }
+
+        // progress bar
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favcon) {
+            progress.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            // hide certain parts of web page
+            //view.loadUrl("javascript:(function() { " + "document.getElementById('app').style.display = 'none';" + "})()");
+            progress.setVisibility(View.GONE);
+        }
+
+        //  error page
+        @Override
+        public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+            Log.e(String.valueOf(errorCode), description);
+            // API level 5: WebViewClient.ERROR_HOST_LOOKUP
+            if (errorCode == -2) {
+                view.loadUrl("file:///android_asset/error.html");
+                return;
+            }
+            // Default behaviour
+            super.onReceivedError(view, errorCode, description, failingUrl);
+        }
     }
 
     class UriChromeClient extends WebChromeClient {
-
         @Override
         public boolean onCreateWindow(WebView view, boolean isDialog,
                                       boolean isUserGesture, Message resultMsg) {
@@ -267,28 +343,32 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    // functions of back & menu hard keys
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        WebView myWebView = (WebView) findViewById(R.id.main);
-        if ((keyCode == KeyEvent.KEYCODE_BACK) && myWebView.canGoBack()) {
-            if (one.getVisibility() == View.INVISIBLE) {
-                two.setVisibility(View.INVISIBLE);
-                a.setVisibility(View.INVISIBLE);
-                b.setVisibility(View.INVISIBLE);
-                c.setVisibility(View.INVISIBLE);
-                d.setVisibility(View.INVISIBLE);
-                e.setVisibility(View.INVISIBLE);
-                one.setVisibility(View.VISIBLE);
-            }
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && one.getVisibility() == View.INVISIBLE) {
+            two.setVisibility(View.INVISIBLE);
+            a.setVisibility(View.INVISIBLE);
+            b.setVisibility(View.INVISIBLE);
+            c.setVisibility(View.INVISIBLE);
+            d.setVisibility(View.INVISIBLE);
+            e.setVisibility(View.INVISIBLE);
+            one.setVisibility(View.VISIBLE);
+            return true;
+        }
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && myWebView.canGoBack() && one.getVisibility() == View.VISIBLE) {
             myWebView.goBack();
             return true;
         }
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (mWebviewPop != null) {
-                mWebviewPop.setVisibility(View.GONE);
-                mContainer.removeView(mWebviewPop);
-                mWebviewPop = null;
-            }
+        if (keyCode == KeyEvent.KEYCODE_BACK && mWebviewPop != null && mWebviewPop.canGoBack()) {
+            mWebviewPop.goBack();
+            return true;
+        }
+        if (keyCode == KeyEvent.KEYCODE_BACK && mWebviewPop != null && !mWebviewPop.canGoBack()) {
+            mWebviewPop.setVisibility(View.GONE);
+            mContainer.removeView(mWebviewPop);
+            mWebviewPop = null;
+            return true;
         }
         if (keyCode == KeyEvent.KEYCODE_MENU) {
             if (one.getVisibility() == View.VISIBLE) {
@@ -326,14 +406,15 @@ public class MainActivity extends ActionBarActivity {
         }
         mBackPressed = System.currentTimeMillis();
     }
-        /* case R.id.downloads:
-             Uri uri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
-                    + "");
-             Intent open = new Intent(Intent.ACTION_VIEW);
-              open.setDataAndType(uri, "audio/mpeg");
-              startActivity(Intent.createChooser(open, "Open downloaded files"));
-             return true;
-            case R.id.exit:
-                finish();}return super.onOptionsItemSelected(item);}*/
+
+    /* case R.id.downloads:
+         Uri uri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
+                + "");
+         Intent open = new Intent(Intent.ACTION_VIEW);
+          open.setDataAndType(uri, "audio/mpeg");
+          startActivity(Intent.createChooser(open, "Open downloaded files"));
+         return true;
+        case R.id.exit:
+            finish();}return super.onOptionsItemSelected(item);}*/
 
 }

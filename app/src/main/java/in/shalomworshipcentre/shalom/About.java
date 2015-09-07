@@ -1,23 +1,75 @@
 package in.shalomworshipcentre.shalom;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.Toast;
 
 public class About extends ActionBarActivity {
+    public Switch mySwitch;
+    public SharedPreferences prefs;
+    String settingsTAG = "AppSettings";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
         setContentView(R.layout.about);
+        mySwitch = (Switch) findViewById(R.id.mySwitch);
+        //SharedPreferences sharedPrefs = getSharedPreferences("SwitchButton", MODE_PRIVATE);
+        //mySwitch.setChecked(sharedPrefs.getBoolean("smart", false));
+        prefs = getSharedPreferences(settingsTAG, 0);
+        mySwitch.setChecked(prefs.getBoolean("rb0", false));
+
+
+        //attach a listener to check for changes in state
+        mySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+
+                if (isChecked) {
+                    prefs = getSharedPreferences(settingsTAG, 0);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putBoolean("rb0",true);
+                    editor.commit();
+
+                    //restart
+                    Intent exit = new Intent(About.this, MainActivity.class);
+                    exit.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    exit.putExtra("on", true);
+                    startActivity(exit);
+                    finish();
+                } else {
+                    prefs = getSharedPreferences(settingsTAG, 0);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putBoolean("rb0",false);
+                    editor.commit();
+
+                    // apply change
+                    Intent exit = new Intent(About.this, MainActivity.class);
+                    exit.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    exit.putExtra("off", true);
+                    startActivity(exit);
+                    finish();
+                }
+
+            }
+        });
+        /* check the current state of switch
+
+           if (mySwitch.isChecked()) {
+            } else {
+            }*/
+
     }
-    public void check (View view)
-    {
+
+    public void check(View view) {
         if (!DetectConnection.checkInternetConnection(this)) {
             Toast.makeText(getApplicationContext(), "No Internet! Please enable net and retry", Toast.LENGTH_SHORT).show();
         } else {
@@ -28,40 +80,20 @@ public class About extends ActionBarActivity {
             finish();
         }
     }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        ActionBar actionBar = getSupportActionBar();
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_about, menu);
 
-        //hide action bar
-        //actionBar.hide();
-        return true;
+    public void share(View view) {
+        Intent share = new Intent();
+        share.setAction(Intent.ACTION_SEND);
+        share.putExtra(Intent.EXTRA_TEXT,
+                "Hey check out this app at: http://shalomworshipcentre.in/app.html");
+        share.setType("text/plain");
+        startActivity(share);
     }
 
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        switch (item.getItemId()) {
-            case R.id.share:
-                Intent share = new Intent();
-                share.setAction(Intent.ACTION_SEND);
-                share.putExtra(Intent.EXTRA_TEXT,
-                        "Hey check out this app at: http://shalomworshipcentre.in/app.html");
-                share.setType("text/plain");
-                startActivity(share);
-                return true;
-            case R.id.exit:
-                Intent exit = new Intent(this, MainActivity.class);
-                exit.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                exit.putExtra("Exit", true);
-                startActivity(exit);
-                finish();
-        }
-        return super.onOptionsItemSelected(item);
+    public void help(View view) {
+        Intent help = new Intent(this, New.class);
+        startActivity(help);
+        finish();
     }
 
 }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
@@ -12,8 +13,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.CookieManager;
-import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -43,7 +44,7 @@ public class MainActivity extends ActionBarActivity {
     private WebView myWebView;
     private WebView mWebviewPop;
     public static String homeUrl;
-    private ProgressBar progress;
+    public ProgressBar progress;
     String settingsTAG;
     SharedPreferences prefs;
     boolean rb0;
@@ -52,7 +53,14 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
+        // hide status
+        if (Build.VERSION.SDK_INT < 16) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(uiOptions);
 
         //show help screen on first run
         Boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
@@ -108,6 +116,7 @@ public class MainActivity extends ActionBarActivity {
                 Toast.makeText(getBaseContext(), "About.. ", Toast.LENGTH_SHORT).show();
                 Intent about = new Intent(MainActivity.this, About.class);
                 startActivity(about);
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
             }
         });
         b = (ImageView) findViewById(R.id.b);
@@ -115,6 +124,8 @@ public class MainActivity extends ActionBarActivity {
             public void onClick(View view) {
                 Intent notif = new Intent(MainActivity.this, Notif.class);
                 startActivity(notif);
+                overridePendingTransition(R.anim.push_down_in, R.anim.push_down_out);
+
             }
         });
         c = (ImageView) findViewById(R.id.c);
@@ -122,10 +133,11 @@ public class MainActivity extends ActionBarActivity {
             public void onClick(View view) {
                 if (!DetectConnection.checkInternetConnection(MainActivity.this)) {
                     Toast.makeText(MainActivity.this, "Offline - Reload", Toast.LENGTH_SHORT).show();
-                    Intent mStartActivity = new Intent(MainActivity.this, MainActivity.class);
-                    finish();
-                    startActivity(mStartActivity);
-
+                    Intent i = getBaseContext().getPackageManager()
+                            .getLaunchIntentForPackage(getBaseContext().getPackageName());
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
+                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
                 } else {
                     Toast.makeText(MainActivity.this, "Refreshing..", Toast.LENGTH_LONG).show();
                     myWebView.reload();
@@ -141,12 +153,15 @@ public class MainActivity extends ActionBarActivity {
                 share.putExtra(Intent.EXTRA_TEXT, "Hey! check out " + Url);
                 share.setType("text/plain");
                 startActivity(share);
+                overridePendingTransition(R.anim.abc_slide_in_bottom, R.anim.abc_slide_out_top);
+
             }
         });
         e = (ImageView) findViewById(R.id.e);
         e.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 finish();
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
 
@@ -156,23 +171,26 @@ public class MainActivity extends ActionBarActivity {
         if (rb0) {
             homeUrl = "http://shalomworshipcentre.in/mobile.html";
         } else {
-            homeUrl = "http://shalomworshipcentre.in";
+            homeUrl = "http://shalomworshipcentre.in/";
 
         }
 
         //intent passed from about activity
         if (getIntent().getBooleanExtra("on", false)) {
             Toast.makeText(MainActivity.this, "smartHome on", Toast.LENGTH_SHORT).show();
-            Intent mStartActivity = new Intent(MainActivity.this, MainActivity.class);
-            finish();
-            startActivity(mStartActivity);
+            Intent i = getBaseContext().getPackageManager()
+                    .getLaunchIntentForPackage(getBaseContext().getPackageName());
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
             return; // add this to prevent from doing unnecessary stuffs
-
         }
         if (getIntent().getBooleanExtra("off", false)) {
-            Intent mStartActivity = new Intent(MainActivity.this, MainActivity.class);
-            finish();
-            startActivity(mStartActivity);
+            Intent i = getBaseContext().getPackageManager()
+                    .getLaunchIntentForPackage(getBaseContext().getPackageName());
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
             return;
         }
 
@@ -181,8 +199,7 @@ public class MainActivity extends ActionBarActivity {
         webSettings.setJavaScriptEnabled(true);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webSettings.setSupportMultipleWindows(true);
-        CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.setAcceptCookie(true);
+        CookieManager.getInstance().setAcceptCookie(true);
         //chrome client
         myWebView.setWebChromeClient(new UriChromeClient());
         // Function to load URLs in same webview
@@ -212,7 +229,7 @@ public class MainActivity extends ActionBarActivity {
         myWebView.loadUrl(homeUrl);
 
         //downloading files using external browser
-        myWebView.setDownloadListener(new DownloadListener() {
+      /*  myWebView.setDownloadListener(new DownloadListener() {
             public void onDownloadStart(String url, String userAgent,
                                         String contentDisposition, String mimetype,
                                         long contentLength) {
@@ -220,19 +237,8 @@ public class MainActivity extends ActionBarActivity {
                 i.setData(Uri.parse(url));
                 startActivity(i);
             }
-        });
-        //download using download manager
-       /* myWebView.setDownloadListener(new DownloadListener() {
-            public void onDownloadStart(String url, String userAgent,
-                                        String contentDisposition, String mimetype,
-                                        long contentLength) {
-                DownloadManager.Request request = new DownloadManager.Request(
-                        Uri.parse(url));
-                request.allowScanningByMediaScanner();
-                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "Shalom.mp3");
-                DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-                dm.enqueue(request);}});*/
+        });*/
+        myWebView.setDownloadListener(new MyDownloadListener(myWebView.getContext()));
         // parse code
         try {
             Intent intent = getIntent();
@@ -246,7 +252,6 @@ public class MainActivity extends ActionBarActivity {
                 final Intent a = new Intent(MainActivity.this, Notif.class);
                 //a.putExtra(EXTRA_MESSAGE, pushStore);
                 startActivity(a);
-
                 todo = new Todo();
                 todo.setUuidString();
                 todo.setTitle(pushStore);
@@ -271,7 +276,7 @@ public class MainActivity extends ActionBarActivity {
 
     private class UriWebViewClient extends WebViewClient {
         @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        public boolean shouldOverrideUrlLoading(WebView view, final String url) {
             String host = Uri.parse(url).getHost();
             if (host.contains("shalomworshipcentre.in")) {
                 // This is my web site, so do not override; let my WebView load
@@ -305,7 +310,10 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onPageFinished(WebView view, String url) {
             // hide certain parts of web page
-            //view.loadUrl("javascript:(function() { " + "document.getElementById('app').style.display = 'none';" + "})()");
+            view.loadUrl("javascript:(function() { " + "document.getElementById('app').innerHTML = '<h2><center>Hello Everyone !.</center></h2>';" +
+                    "document.getElementById('app1').style.display = 'none';" +
+                    "document.getElementById('app2').style.display = 'none';" +
+                    "})()");
             progress.setVisibility(View.GONE);
         }
 
@@ -321,6 +329,7 @@ public class MainActivity extends ActionBarActivity {
             // Default behaviour
             super.onReceivedError(view, errorCode, description, failingUrl);
         }
+
     }
 
     class UriChromeClient extends WebChromeClient {
@@ -400,6 +409,7 @@ public class MainActivity extends ActionBarActivity {
     public void onBackPressed() {
         if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
             super.onBackPressed();
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             return;
         } else {
             Toast.makeText(getBaseContext(), "Tap once more to exit", Toast.LENGTH_SHORT).show();

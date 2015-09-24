@@ -5,5 +5,5 @@
     <string name="notif">No notifications.</string>
     <string name="url1">http://www.shalomworshipcentre.in</string>
     <string name="url2">http://www.shalomworshipcentre.in/mobile.html</string>
-    <string name="smart">Load only latest info from home page(for slow data connections).</string>
+    <string name="smart">Load only latest info from \'Home\' (for slow data connections).</string>
 </resources>

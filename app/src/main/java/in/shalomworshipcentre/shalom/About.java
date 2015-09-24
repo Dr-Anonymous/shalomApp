@@ -2,9 +2,11 @@ package in.shalomworshipcentre.shalom;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -18,7 +20,14 @@ public class About extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
+
+        if (Build.VERSION.SDK_INT < 16) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(uiOptions);
         setContentView(R.layout.about);
         mySwitch = (Switch) findViewById(R.id.mySwitch);
         //SharedPreferences sharedPrefs = getSharedPreferences("SwitchButton", MODE_PRIVATE);
@@ -36,7 +45,7 @@ public class About extends ActionBarActivity {
                 if (isChecked) {
                     prefs = getSharedPreferences(settingsTAG, 0);
                     SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean("rb0",true);
+                    editor.putBoolean("rb0", true);
                     editor.commit();
 
                     //restart
@@ -48,7 +57,7 @@ public class About extends ActionBarActivity {
                 } else {
                     prefs = getSharedPreferences(settingsTAG, 0);
                     SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean("rb0",false);
+                    editor.putBoolean("rb0", false);
                     editor.commit();
 
                     // apply change
@@ -77,7 +86,8 @@ public class About extends ActionBarActivity {
                     .show();
             Intent check = new Intent(About.this, Check.class);
             startActivity(check);
-            finish();
+            overridePendingTransition(R.anim.push_down_in, R.anim.push_down_out);
+
         }
     }
 
@@ -88,12 +98,18 @@ public class About extends ActionBarActivity {
                 "Hey check out this app at: http://shalomworshipcentre.in/app.html");
         share.setType("text/plain");
         startActivity(share);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
     }
 
     public void help(View view) {
         Intent help = new Intent(this, New.class);
         startActivity(help);
-        finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
 }

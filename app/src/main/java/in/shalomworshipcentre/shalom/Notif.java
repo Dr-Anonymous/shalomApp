@@ -3,10 +3,13 @@ package in.shalomworshipcentre.shalom;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -26,6 +29,15 @@ public class Notif extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // hide status and actionbar
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        if (Build.VERSION.SDK_INT < 16) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(uiOptions);
         setContentView(R.layout.activity_todo_list);
        /* Intent b = getIntent();
         String pushStore = b.getStringExtra(MainActivity.EXTRA_MESSAGE);
@@ -100,5 +112,10 @@ public class Notif extends Activity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+    }
 
 }

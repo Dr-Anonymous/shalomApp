@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="in.shalomworshipcentre.shalom"
     android:versionCode="2"
-    android:versionName="2.1">
+    android:versionName="2.3">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -58,7 +58,18 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="New"
             android:parentActivityName=".MainActivity"></activity>
+        <activity
+            android:name=".FileBrowser"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="File Browesr"
+            android:parentActivityName=".MainActivity"></activity>
+        <activity
+            android:name=".MyMediaPlayer"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="Media Player"
+            android:parentActivityName=".FileBrowser"></activity>
 
+        <service android:name=".PlayerService" />
         <service android:name="com.parse.PushService" />
 
         <receiver android:name="com.parse.ParseBroadcastReceiver">
@@ -83,9 +94,6 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
 
-                <!--
-                  IMPORTANT: Change "com.parse.starter" to match your app's package name.
-                -->
                 <category android:name="in.shalomworshipcentre.shalom" />
             </intent-filter>
         </receiver>

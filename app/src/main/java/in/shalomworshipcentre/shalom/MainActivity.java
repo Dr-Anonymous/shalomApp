@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
@@ -13,7 +12,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -39,6 +37,7 @@ public class MainActivity extends ActionBarActivity {
     private ImageView c = null;
     private ImageView d = null;
     private ImageView e = null;
+    private ImageView f = null;
     public Todo todo;
     private FrameLayout mContainer;
     private WebView myWebView;
@@ -53,20 +52,11 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // hide status
-        if (Build.VERSION.SDK_INT < 16) {
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        }
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        View decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(uiOptions);
 
         //show help screen on first run
         Boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
                 .getBoolean("isFirstRun", true);
         if (isFirstRun) {
-            Toast.makeText(MainActivity.this, "Hi there !", Toast.LENGTH_SHORT).show();
             Intent first = new Intent(MainActivity.this, New.class);
             startActivity(first);
         }
@@ -96,6 +86,8 @@ public class MainActivity extends ActionBarActivity {
                 c.setVisibility(View.VISIBLE);
                 d.setVisibility(View.VISIBLE);
                 e.setVisibility(View.VISIBLE);
+                f.setVisibility(View.VISIBLE);
+
             }
         });
         two = (ImageView) findViewById(R.id.hide);
@@ -107,13 +99,13 @@ public class MainActivity extends ActionBarActivity {
                 c.setVisibility(View.INVISIBLE);
                 d.setVisibility(View.INVISIBLE);
                 e.setVisibility(View.INVISIBLE);
+                f.setVisibility(View.INVISIBLE);
                 one.setVisibility(View.VISIBLE);
             }
         });
         a = (ImageView) findViewById(R.id.a);
         a.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                Toast.makeText(getBaseContext(), "About.. ", Toast.LENGTH_SHORT).show();
                 Intent about = new Intent(MainActivity.this, About.class);
                 startActivity(about);
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
@@ -154,7 +146,6 @@ public class MainActivity extends ActionBarActivity {
                 share.setType("text/plain");
                 startActivity(share);
                 overridePendingTransition(R.anim.abc_slide_in_bottom, R.anim.abc_slide_out_top);
-
             }
         });
         e = (ImageView) findViewById(R.id.e);
@@ -162,6 +153,14 @@ public class MainActivity extends ActionBarActivity {
             public void onClick(View view) {
                 finish();
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            }
+        });
+        f = (ImageView) findViewById(R.id.f);
+        f.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Intent browse = new Intent(MainActivity.this, FileBrowser.class);
+                startActivity(browse);
+                overridePendingTransition(R.anim.abc_slide_in_bottom, R.anim.abc_slide_out_top);
             }
         });
 
@@ -174,8 +173,15 @@ public class MainActivity extends ActionBarActivity {
             homeUrl = "http://shalomworshipcentre.in/";
 
         }
-
         //intent passed from about activity
+        if (getIntent().getBooleanExtra("off", false)) {
+            Intent i = getBaseContext().getPackageManager()
+                    .getLaunchIntentForPackage(getBaseContext().getPackageName());
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+            return;
+        }
         if (getIntent().getBooleanExtra("on", false)) {
             Toast.makeText(MainActivity.this, "smartHome on", Toast.LENGTH_SHORT).show();
             Intent i = getBaseContext().getPackageManager()
@@ -184,14 +190,6 @@ public class MainActivity extends ActionBarActivity {
             startActivity(i);
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
             return; // add this to prevent from doing unnecessary stuffs
-        }
-        if (getIntent().getBooleanExtra("off", false)) {
-            Intent i = getBaseContext().getPackageManager()
-                    .getLaunchIntentForPackage(getBaseContext().getPackageName());
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(i);
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-            return;
         }
 
         //Enabling JavaScript
@@ -294,7 +292,6 @@ public class MainActivity extends ActionBarActivity {
             if (host.contains("facebook")) {
                 return false;
             }
-
             // Otherwise, the link is not for a page on my site
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             startActivity(intent);
@@ -310,9 +307,8 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onPageFinished(WebView view, String url) {
             // hide certain parts of web page
-            view.loadUrl("javascript:(function() { " + "document.getElementById('app').innerHTML = '<h2><center>Hello Everyone !.</center></h2>';" +
-                    "document.getElementById('app1').style.display = 'none';" +
-                    "document.getElementById('app2').style.display = 'none';" +
+            view.loadUrl("javascript:(function(){" +
+                    "var x= document.getElementsByClassName('app');var i;for (i = 0; i < x.length; i++) {x[i].style.display= 'none';}" +
                     "})()");
             progress.setVisibility(View.GONE);
         }
@@ -362,6 +358,7 @@ public class MainActivity extends ActionBarActivity {
             c.setVisibility(View.INVISIBLE);
             d.setVisibility(View.INVISIBLE);
             e.setVisibility(View.INVISIBLE);
+            f.setVisibility(View.INVISIBLE);
             one.setVisibility(View.VISIBLE);
             return true;
         }
@@ -388,6 +385,7 @@ public class MainActivity extends ActionBarActivity {
                 c.setVisibility(View.VISIBLE);
                 d.setVisibility(View.VISIBLE);
                 e.setVisibility(View.VISIBLE);
+                f.setVisibility(View.VISIBLE);
             } else {
                 two.setVisibility(View.INVISIBLE);
                 a.setVisibility(View.INVISIBLE);
@@ -395,6 +393,7 @@ public class MainActivity extends ActionBarActivity {
                 c.setVisibility(View.INVISIBLE);
                 d.setVisibility(View.INVISIBLE);
                 e.setVisibility(View.INVISIBLE);
+                f.setVisibility(View.INVISIBLE);
                 one.setVisibility(View.VISIBLE);
             }
 

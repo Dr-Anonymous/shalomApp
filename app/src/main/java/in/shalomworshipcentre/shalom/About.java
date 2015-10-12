@@ -2,11 +2,9 @@ package in.shalomworshipcentre.shalom;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -20,14 +18,6 @@ public class About extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
-        if (Build.VERSION.SDK_INT < 16) {
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        }
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        View decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(uiOptions);
         setContentView(R.layout.about);
         mySwitch = (Switch) findViewById(R.id.mySwitch);
         //SharedPreferences sharedPrefs = getSharedPreferences("SwitchButton", MODE_PRIVATE);

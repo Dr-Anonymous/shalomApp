@@ -15,6 +15,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:layout_marginBottom="15dp"
         android:background="#d1ffffff"
         android:contentDescription="@string/about"
@@ -29,7 +30,7 @@
         android:id="@+id/txt2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/mySwitch"
+        android:layout_above="@+id/v1"
         android:layout_marginBottom="15dp"
         android:background="#d1ffffff"
         android:gravity="center_horizontal|center_vertical"
@@ -88,7 +89,7 @@
         android:id="@+id/txt3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/btn"
+        android:layout_above="@+id/v2"
         android:background="#d1ffffff"
         android:gravity="center_horizontal|center_vertical"
         android:text="@string/smart"
@@ -96,15 +97,17 @@
         android:textSize="15sp" />
 
     <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_above="@+id/btn"
-        android:background="#000000"></View>
-
-    <View
+        android:id="@+id/v1"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_above="@+id/mySwitch"
+        android:background="#000000"></View>
+
+    <View
+        android:id="@+id/v2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@+id/btn"
         android:background="#000000"></View>
 
 </RelativeLayout>

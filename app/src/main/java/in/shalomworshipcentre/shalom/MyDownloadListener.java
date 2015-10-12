@@ -20,6 +20,7 @@ public class MyDownloadListener implements DownloadListener {
     private long mDownloadedFileID;
     private DownloadManager.Request mRequest;
     private static String filename;
+    File direct;
 
     public MyDownloadListener(Context context) {
         mContext = context;
@@ -66,9 +67,8 @@ public class MyDownloadListener implements DownloadListener {
 
         mRequest = new DownloadManager.Request(Uri.parse(url));
         // create the directory if not there
-        File direct = new File(Environment.getExternalStorageDirectory()
+        direct = new File(Environment.getExternalStorageDirectory()
                 + "/Shalom");
-
         if (!direct.exists()) {
             direct.mkdirs();
         }
@@ -91,7 +91,7 @@ public class MyDownloadListener implements DownloadListener {
         }*/
         // so ---
         filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
-        // Sets the file path to save to, including the file name. Make sure to have the WRITE_EXTERNAL_STORAGE permission!!
+        // Sets the file path to save to, including the file name.
         mRequest.setDestinationInExternalPublicDir("/Shalom", filename);
         // Sets the title of the notification and how it appears to the user in the saved directory.
         mRequest.setTitle(filename);
@@ -101,7 +101,7 @@ public class MyDownloadListener implements DownloadListener {
 
         // Adds the request to the DownloadManager queue to be executed at the next available opportunity.
         mDownloadedFileID = mDownloadManager.enqueue(mRequest);
-        Toast.makeText(mContext, "Downloading.....", Toast.LENGTH_LONG).show();
+        Toast.makeText(mContext, "Downloading . . .", Toast.LENGTH_LONG).show();
 
     }
 }

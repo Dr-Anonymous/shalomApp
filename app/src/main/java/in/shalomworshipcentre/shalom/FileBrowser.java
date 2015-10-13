@@ -68,7 +68,7 @@ public class FileBrowser extends ListActivity {
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         }
-        if ((filename).endsWith(".mp3") || filename.endsWith(".wav")) {
+        if (filename.endsWith(".mp3") || filename.endsWith(".wav")) {
             //Intent newIntent = new Intent(MediaStore.INTENT_ACTION_MUSIC_PLAYER);
             Intent newIntent = new Intent(this, MyMediaPlayer.class);
             newIntent.putExtra("path", filename);
@@ -76,7 +76,7 @@ public class FileBrowser extends ListActivity {
             this.startActivity(newIntent);
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
 
-            //startService();
+            // startService();
 
         } else {
             //stopService();
@@ -86,7 +86,8 @@ public class FileBrowser extends ListActivity {
 
     // Method to start the service
     public void startService() {
-        startService(new Intent(getBaseContext(), PlayerService.class));
+        Intent svc = new Intent(this, PlayerService.class);
+        startService(svc);
     }
 
     // Method to stop the service

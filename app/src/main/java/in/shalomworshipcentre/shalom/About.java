@@ -40,7 +40,6 @@ public class About extends ActionBarActivity {
 
                     //restart
                     Intent exit = new Intent(About.this, MainActivity.class);
-                    exit.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     exit.putExtra("on", true);
                     startActivity(exit);
                     finish();
@@ -52,7 +51,6 @@ public class About extends ActionBarActivity {
 
                     // apply change
                     Intent exit = new Intent(About.this, MainActivity.class);
-                    exit.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     exit.putExtra("off", true);
                     startActivity(exit);
                     finish();
@@ -60,11 +58,6 @@ public class About extends ActionBarActivity {
 
             }
         });
-        /* check the current state of switch
-
-           if (mySwitch.isChecked()) {
-            } else {
-            }*/
 
     }
 

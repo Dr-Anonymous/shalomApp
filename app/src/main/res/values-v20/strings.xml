@@ -4,4 +4,6 @@
     <string name="feedback">Please mail your feedback and bug reports to \'shalomworshipcentre.kkd@gmail.com\'</string>
     <string name="notif">No notifications.</string>
     <string name="smart">Load only latest info from \'Home\' (for slow data connections).</string>
+    <string name="timer">00 : 00</string>
+
 </resources>

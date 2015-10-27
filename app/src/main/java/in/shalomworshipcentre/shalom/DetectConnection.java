@@ -19,5 +19,4 @@ public class DetectConnection {
             return false;
         }
     }
-
 }

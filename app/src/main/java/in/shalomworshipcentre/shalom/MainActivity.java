@@ -1,8 +1,6 @@
 package in.shalomworshipcentre.shalom;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,9 +20,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.parse.ParseException;
-import com.parse.SaveCallback;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,23 +33,20 @@ public class MainActivity extends ActionBarActivity {
     private ImageView d = null;
     private ImageView e = null;
     private ImageView f = null;
-    public Todo todo;
     private FrameLayout mContainer;
-    private WebView myWebView;
-    private WebView mWebviewPop;
+    private WebView myWebView, mWebviewPop;
     public static String homeUrl;
     public ProgressBar progress;
-    String settingsTAG;
-    SharedPreferences prefs;
-    boolean rb0;
+    boolean smart, isFirstRun;
     WebSettings webSettings;
+    static String pushStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //show help screen on first run
-        Boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+        isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
                 .getBoolean("isFirstRun", true);
         if (isFirstRun) {
             Intent first = new Intent(MainActivity.this, New.class);
@@ -124,12 +116,7 @@ public class MainActivity extends ActionBarActivity {
         c.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 if (!DetectConnection.checkInternetConnection(MainActivity.this)) {
-                    Toast.makeText(MainActivity.this, "Offline - Reload", Toast.LENGTH_SHORT).show();
-                    Intent i = getBaseContext().getPackageManager()
-                            .getLaunchIntentForPackage(getBaseContext().getPackageName());
-                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(i);
-                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+                    restart();
                 } else {
                     Toast.makeText(MainActivity.this, "Refreshing..", Toast.LENGTH_LONG).show();
                     myWebView.reload();
@@ -160,36 +147,14 @@ public class MainActivity extends ActionBarActivity {
             public void onClick(View view) {
                 Intent browse = new Intent(MainActivity.this, FileBrowser.class);
                 startActivity(browse);
-                overridePendingTransition(R.anim.abc_slide_in_bottom, R.anim.abc_slide_out_top);
+                overridePendingTransition(R.anim.push_up_in, R.anim.push_up_out);
             }
         });
 
-        settingsTAG = "AppSettings";
-        prefs = getSharedPreferences(settingsTAG, 0);
-        rb0 = prefs.getBoolean("rb0", false);
-        if (rb0) {
-            homeUrl = "http://shalomworshipcentre.in/mobile.html";
-        } else {
-            homeUrl = "http://shalomworshipcentre.in/";
-
-        }
-        //intent passed from about activity
-        if (getIntent().getBooleanExtra("off", false)) {
-            Intent i = getBaseContext().getPackageManager()
-                    .getLaunchIntentForPackage(getBaseContext().getPackageName());
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(i);
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+        //intent passed from 'about' activity
+        if (getIntent().getBooleanExtra("restart", false)) {
+            restart();
             return;
-        }
-        if (getIntent().getBooleanExtra("on", false)) {
-            Toast.makeText(MainActivity.this, "smartHome on", Toast.LENGTH_SHORT).show();
-            Intent i = getBaseContext().getPackageManager()
-                    .getLaunchIntentForPackage(getBaseContext().getPackageName());
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(i);
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
-            return; // add this to prevent from doing unnecessary stuffs
         }
 
         //Enabling JavaScript
@@ -202,9 +167,7 @@ public class MainActivity extends ActionBarActivity {
         myWebView.setWebChromeClient(new UriChromeClient());
         // Function to load URLs in same webview
         myWebView.setWebViewClient(new UriWebViewClient());
-        //cache path ---
-        //webSettings.setAppCachePath(getApplicationContext().getCacheDir().getAbsolutePath());
-        //allow file access
+         //allow file access
         webSettings.setAllowFileAccess(true);
         //cache enabled
         webSettings.setAppCacheEnabled(true);
@@ -223,7 +186,13 @@ public class MainActivity extends ActionBarActivity {
         progress = (ProgressBar) findViewById(R.id.progressBar);
         progress.setVisibility(View.GONE);
 
-        // load the url
+        // smartHome url or not
+        smart = getSharedPreferences(About.settingsTAG, MODE_PRIVATE).getBoolean("smart", false);
+        if (smart) {
+            homeUrl = "http://shalomworshipcentre.in/mobile.html";
+        } else {
+            homeUrl = "http://shalomworshipcentre.in/";
+        }
         myWebView.loadUrl(homeUrl);
 
         //downloading files using external browser
@@ -237,39 +206,8 @@ public class MainActivity extends ActionBarActivity {
             }
         });*/
         myWebView.setDownloadListener(new MyDownloadListener(myWebView.getContext()));
-        // parse code
-        try {
-            Intent intent = getIntent();
-            Bundle extras = intent.getExtras();
-            if (extras != null) {
-                String jsonData = extras.getString("com.parse.Data");
-                JSONObject json;
-                json = new JSONObject(jsonData);
-                String pushStore = json.getString("alert");
-                //data.setText(pushStore);
-                final Intent a = new Intent(MainActivity.this, Notif.class);
-                //a.putExtra(EXTRA_MESSAGE, pushStore);
-                startActivity(a);
-                todo = new Todo();
-                todo.setUuidString();
-                todo.setTitle(pushStore);
-                todo.setDraft(true);
-                todo.pinInBackground(Application.TODO_GROUP_NAME,
-                        new SaveCallback() {
-
-                            @Override
-                            public void done(ParseException e) {
-                                if (isFinishing()) {
-                                    return;
-                                }
-                                if (e == null) {
-                                    setResult(Activity.RESULT_OK);
-                                }
-                            }
-                        });
-            }
-        } catch (JSONException e) {
-        }
+        // push notifications-
+        parse();
     }
 
     private class UriWebViewClient extends WebViewClient {
@@ -285,7 +223,7 @@ public class MainActivity extends ActionBarActivity {
                 }
                 return false;
             }
-            if ((host.contains("facebook")) && rb0) {
+            if ((host.contains("facebook")) && smart) {
                 view.loadUrl("https://m.facebook.com/shalomworshipcentre.kkd");
                 return false;
             }
@@ -317,7 +255,6 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             Log.e(String.valueOf(errorCode), description);
-            // API level 5: WebViewClient.ERROR_HOST_LOOKUP
             if (errorCode == -2) {
                 view.loadUrl("file:///android_asset/error.html");
                 return;
@@ -416,6 +353,28 @@ public class MainActivity extends ActionBarActivity {
         mBackPressed = System.currentTimeMillis();
     }
 
+    public void restart() {
+        Toast.makeText(MainActivity.this, "Reloading..", Toast.LENGTH_SHORT).show();
+        Intent i = getBaseContext().getPackageManager()
+                .getLaunchIntentForPackage(getBaseContext().getPackageName());
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
+    }
+
+    public void parse() {// parse code
+        try {
+            Bundle extras = getIntent().getExtras();
+            if (extras != null) {
+                String jsonData = extras.getString("com.parse.Data");
+                JSONObject json = new JSONObject(jsonData);
+                pushStore = json.getString("alert");
+                final Intent a = new Intent(MainActivity.this, Notif.class);
+                startActivity(a);
+            }
+        } catch (JSONException e) {
+        }
+    }
     /* case R.id.downloads:
          Uri uri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
                 + "");

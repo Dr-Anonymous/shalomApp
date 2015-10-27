@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="in.shalomworshipcentre.shalom"
-    android:versionCode="2"
-    android:versionName="2.3">
+    android:versionCode="1"
+    android:versionName="3.1">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -15,6 +15,8 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <permission
         android:name="in.shalomworshipcentre.shalom.permission.C2D_MESSAGE"
@@ -34,42 +36,41 @@
             android:label="Shalom">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".About"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="About"
-            android:parentActivityName=".MainActivity"></activity>
+            android:label="About"></activity>
         <activity
             android:name=".Check"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="Check Updates"
-            android:parentActivityName=".About"></activity>
+            android:label="Check Updates"></activity>
         <activity
             android:name=".Notif"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="Notifications"
-            android:parentActivityName=".MainActivity"></activity>
+            android:label="Notifications"></activity>
         <activity
             android:name=".New"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="New"
-            android:parentActivityName=".MainActivity"></activity>
+            android:label="New"></activity>
         <activity
             android:name=".FileBrowser"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="File Browesr"
-            android:parentActivityName=".MainActivity"></activity>
+            android:label="File Browesr"></activity>
         <activity
             android:name=".MyMediaPlayer"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:excludeFromRecents="true"
             android:label="Media Player"
-            android:parentActivityName=".FileBrowser"></activity>
+            android:launchMode="singleInstance"
+            android:parentActivityName=".FileBrowser"
+            android:theme="@style/Theme.Transparent"></activity>
 
-        <service android:name=".PlayerService" />
+        <service
+            android:name=".myPlayService"
+            android:enabled="true" />
         <service android:name="com.parse.PushService" />
 
         <receiver android:name="com.parse.ParseBroadcastReceiver">

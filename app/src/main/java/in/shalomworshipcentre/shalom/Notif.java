@@ -11,9 +11,11 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
+import com.parse.SaveCallback;
 
 public class Notif extends Activity {
     // Adapter for the Todos Parse Query
@@ -22,17 +24,31 @@ public class Notif extends Activity {
     // For showing empty and non-empty todo views
     private ListView todoListView;
     private LinearLayout noTodosView;
+    public Todo todo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        try {
+            todo = new Todo();
+            todo.setUuidString();
+            todo.setTitle(MainActivity.pushStore);
+            todo.setDraft(true);
+            todo.pinInBackground(Application.TODO_GROUP_NAME,
+                    new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (isFinishing()) {
+                                return;
+                            }
+                            if (e == null) {
+                                setResult(Activity.RESULT_OK);
+                            }
+                        }
+                    });
+        } catch (Exception e) {
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo_list);
-       /* Intent b = getIntent();
-        String pushStore = b.getStringExtra(MainActivity.EXTRA_MESSAGE);
-        TextView mTextView = (TextView) this.findViewById(R.id.no_todos);
-        if (pushStore != null) {
-            mTextView.setText(pushStore);
-        }*/
         // Set up the views
         todoListView = (ListView) findViewById(R.id.todo_list_view);
         noTodosView = (LinearLayout) findViewById(R.id.no_todos_view);
@@ -55,7 +71,6 @@ public class Notif extends Activity {
         // Attach the query adapter to the view
         ListView todoListView = (ListView) findViewById(R.id.todo_list_view);
         todoListView.setAdapter(todoListAdapter);
-
     }
 
 
@@ -83,8 +98,6 @@ public class Notif extends Activity {
             todoTitle.setTypeface(null, Typeface.NORMAL);
             return view;
         }
-
-
     }
 
     private static class ViewHolder {
@@ -92,12 +105,10 @@ public class Notif extends Activity {
     }
 
     public void clear(View view) {
+        // Unpin all the current objects
+        ParseObject.unpinAllInBackground(Application.TODO_GROUP_NAME);
         // Clear the view
         todoListAdapter.clear();
-        // Unpin all the current objects
-        ParseObject
-                .unpinAllInBackground(Application.TODO_GROUP_NAME);
-
     }
 
     @Override

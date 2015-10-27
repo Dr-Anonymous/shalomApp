@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -16,12 +17,14 @@ import java.util.List;
 
 public class FileBrowser extends ListActivity {
     private String path;
-    String filename;
+    public static String filename, name;
+    TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.browser);
+        textView = (TextView) findViewById(R.id.title);
 
         // Use the current directory as title
         path = Environment.getExternalStorageDirectory()
@@ -44,6 +47,8 @@ public class FileBrowser extends ListActivity {
                     values.add(file);
                 }
             }
+        } else {
+            textView.setText("No Downloads");
         }
         Collections.sort(values);
 
@@ -56,7 +61,7 @@ public class FileBrowser extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         filename = (String) getListAdapter().getItem(position);
-        String name = filename;
+        name = filename;
         if (path.endsWith(File.separator)) {
             filename = path + filename;
         } else {
@@ -68,31 +73,13 @@ public class FileBrowser extends ListActivity {
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         }
-        if (filename.endsWith(".mp3") || filename.endsWith(".wav")) {
-            //Intent newIntent = new Intent(MediaStore.INTENT_ACTION_MUSIC_PLAYER);
+        if (filename.endsWith(".mp3")) {
             Intent newIntent = new Intent(this, MyMediaPlayer.class);
-            newIntent.putExtra("path", filename);
-            newIntent.putExtra("name", name);
-            this.startActivity(newIntent);
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-
-            // startService();
-
+            startActivity(newIntent);
+            overridePendingTransition(R.anim.push_up_in, R.anim.push_up_out);
         } else {
-            //stopService();
             Toast.makeText(this, "Use native file browser.", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    // Method to start the service
-    public void startService() {
-        Intent svc = new Intent(this, PlayerService.class);
-        startService(svc);
-    }
-
-    // Method to stop the service
-    public void stopService() {
-        stopService(new Intent(getBaseContext(), PlayerService.class));
     }
 
     @Override

@@ -12,7 +12,7 @@ import android.widget.Toast;
 public class About extends ActionBarActivity {
     public Switch mySwitch;
     public SharedPreferences prefs;
-    String settingsTAG = "AppSettings";
+    public static String settingsTAG = "switch";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,10 +20,9 @@ public class About extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.about);
         mySwitch = (Switch) findViewById(R.id.mySwitch);
-        //SharedPreferences sharedPrefs = getSharedPreferences("SwitchButton", MODE_PRIVATE);
-        //mySwitch.setChecked(sharedPrefs.getBoolean("smart", false));
-        prefs = getSharedPreferences(settingsTAG, 0);
-        mySwitch.setChecked(prefs.getBoolean("rb0", false));
+
+        prefs = getSharedPreferences(settingsTAG, MODE_PRIVATE);
+        mySwitch.setChecked(prefs.getBoolean("smart", false));
 
 
         //attach a listener to check for changes in state
@@ -31,34 +30,33 @@ public class About extends ActionBarActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
-
                 if (isChecked) {
-                    prefs = getSharedPreferences(settingsTAG, 0);
+                    prefs = getSharedPreferences(settingsTAG, MODE_PRIVATE);
                     SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean("rb0", true);
+                    editor.putBoolean("smart", true);
                     editor.commit();
-
-                    //restart
-                    Intent exit = new Intent(About.this, MainActivity.class);
-                    exit.putExtra("on", true);
-                    startActivity(exit);
-                    finish();
+                    // then restart
+                    restart();
                 } else {
-                    prefs = getSharedPreferences(settingsTAG, 0);
+                    prefs = getSharedPreferences(settingsTAG, MODE_PRIVATE);
                     SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean("rb0", false);
+                    editor.putBoolean("smart", false);
                     editor.commit();
-
-                    // apply change
-                    Intent exit = new Intent(About.this, MainActivity.class);
-                    exit.putExtra("off", true);
-                    startActivity(exit);
-                    finish();
+                    // then restart
+                    restart();
                 }
 
             }
         });
 
+    }
+
+    public void restart() {
+        Intent exit = new Intent(About.this, MainActivity.class);
+        exit.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        exit.putExtra("restart", true);
+        startActivity(exit);
+        finish();
     }
 
     public void check(View view) {

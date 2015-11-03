@@ -2,13 +2,14 @@ package in.shalomworshipcentre.shalom;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-public class New extends ActionBarActivity {
+public class New extends AppCompatActivity {
     private ImageView one = null;
     private ProgressBar progress;
 

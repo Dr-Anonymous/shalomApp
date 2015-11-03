@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -24,7 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
     private ImageView one = null;
     private ImageView two = null;
     private ImageView a = null;
@@ -35,64 +36,42 @@ public class MainActivity extends ActionBarActivity {
     private ImageView f = null;
     private FrameLayout mContainer;
     private WebView myWebView, mWebviewPop;
-    public static String homeUrl;
-    public ProgressBar progress;
+    static String homeUrl, pushStore, activity;
+    private ProgressBar progress;
     boolean smart, isFirstRun;
     WebSettings webSettings;
-    static String pushStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //show help screen on first run
-        isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
-                .getBoolean("isFirstRun", true);
+        isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE).getBoolean("isFirstRun", true);
         if (isFirstRun) {
             Intent first = new Intent(MainActivity.this, New.class);
             startActivity(first);
+            getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit().putBoolean("isFirstRun", false).commit();
         }
-        getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
-                .putBoolean("isFirstRun", false).commit();
 
-
-        setContentView(R.layout.activity_main);//layout
         // layout initialising
-        myWebView = (WebView) findViewById(R.id.main);
+        setContentView(R.layout.activity_main);
         mContainer = (FrameLayout) findViewById(R.id.webview_frame);
+        myWebView = (WebView) findViewById(R.id.main);
         mWebviewPop = (WebView) findViewById(R.id.webviewPop);
-      /*  Handler h = new Handler();
-        h.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // DO DELAYED STUFF
-            }
-        }, 3000);*/
+        progress = (ProgressBar) findViewById(R.id.progressBar);
+        progress.setVisibility(View.GONE);
+
         one = (ImageView) findViewById(R.id.show);
         one.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                one.setVisibility(View.INVISIBLE);
-                two.setVisibility(View.VISIBLE);
-                a.setVisibility(View.VISIBLE);
-                b.setVisibility(View.VISIBLE);
-                c.setVisibility(View.VISIBLE);
-                d.setVisibility(View.VISIBLE);
-                e.setVisibility(View.VISIBLE);
-                f.setVisibility(View.VISIBLE);
+                showbtn();
 
             }
         });
         two = (ImageView) findViewById(R.id.hide);
         two.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                two.setVisibility(View.INVISIBLE);
-                a.setVisibility(View.INVISIBLE);
-                b.setVisibility(View.INVISIBLE);
-                c.setVisibility(View.INVISIBLE);
-                d.setVisibility(View.INVISIBLE);
-                e.setVisibility(View.INVISIBLE);
-                f.setVisibility(View.INVISIBLE);
-                one.setVisibility(View.VISIBLE);
+                hidebtn();
             }
         });
         a = (ImageView) findViewById(R.id.a);
@@ -167,24 +146,22 @@ public class MainActivity extends ActionBarActivity {
         myWebView.setWebChromeClient(new UriChromeClient());
         // Function to load URLs in same webview
         myWebView.setWebViewClient(new UriWebViewClient());
-         //allow file access
+        //allow file access
         webSettings.setAllowFileAccess(true);
         //cache enabled
         webSettings.setAppCacheEnabled(true);
         // load online by default
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        if (!DetectConnection.checkInternetConnection(this)) {// loading offline
+        if (!DetectConnection.checkInternetConnection(this)) {
+            // loading offline
             webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+            Toast.makeText(MainActivity.this, "Offline mode", Toast.LENGTH_SHORT).show();
         }
         //HTML5 localstorage feature
         webSettings.setDomStorageEnabled(true);
         //zoom
         webSettings.setBuiltInZoomControls(true);
         webSettings.setDisplayZoomControls(false);
-
-        // progress bar
-        progress = (ProgressBar) findViewById(R.id.progressBar);
-        progress.setVisibility(View.GONE);
 
         // smartHome url or not
         smart = getSharedPreferences(About.settingsTAG, MODE_PRIVATE).getBoolean("smart", false);
@@ -194,17 +171,6 @@ public class MainActivity extends ActionBarActivity {
             homeUrl = "http://shalomworshipcentre.in/";
         }
         myWebView.loadUrl(homeUrl);
-
-        //downloading files using external browser
-      /*  myWebView.setDownloadListener(new DownloadListener() {
-            public void onDownloadStart(String url, String userAgent,
-                                        String contentDisposition, String mimetype,
-                                        long contentLength) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
-            }
-        });*/
         myWebView.setDownloadListener(new MyDownloadListener(myWebView.getContext()));
         // push notifications-
         parse();
@@ -214,20 +180,13 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, final String url) {
             String host = Uri.parse(url).getHost();
-            if (host.contains("shalomworshipcentre.in")) {
+            if (host.contains("shalomworshipcentre.in") || host.contains("facebook")) {
                 // This is my web site, so do not override; let my WebView load
-                if (mWebviewPop != null) {
+               /* if (mWebviewPop != null) {
                     mWebviewPop.setVisibility(View.GONE);
                     mContainer.removeView(mWebviewPop);
                     mWebviewPop = null;
-                }
-                return false;
-            }
-            if ((host.contains("facebook")) && smart) {
-                view.loadUrl("https://m.facebook.com/shalomworshipcentre.kkd");
-                return false;
-            }
-            if (host.contains("facebook")) {
+                }*/
                 return false;
             }
             // Otherwise, the link is not for a page on my site
@@ -262,7 +221,6 @@ public class MainActivity extends ActionBarActivity {
             // Default behaviour
             super.onReceivedError(view, errorCode, description, failingUrl);
         }
-
     }
 
     class UriChromeClient extends WebChromeClient {
@@ -275,8 +233,6 @@ public class MainActivity extends ActionBarActivity {
             webSettings.setDisplayZoomControls(false);
             mWebviewPop.setWebViewClient(new UriWebViewClient());
             webSettings.setJavaScriptEnabled(true);
-            mWebviewPop.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT));
             mContainer.addView(mWebviewPop);
             WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
             transport.setWebView(mWebviewPop);
@@ -289,14 +245,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK) && one.getVisibility() == View.INVISIBLE) {
-            two.setVisibility(View.INVISIBLE);
-            a.setVisibility(View.INVISIBLE);
-            b.setVisibility(View.INVISIBLE);
-            c.setVisibility(View.INVISIBLE);
-            d.setVisibility(View.INVISIBLE);
-            e.setVisibility(View.INVISIBLE);
-            f.setVisibility(View.INVISIBLE);
-            one.setVisibility(View.VISIBLE);
+            hidebtn();
             return true;
         }
         if ((keyCode == KeyEvent.KEYCODE_BACK) && myWebView.canGoBack() && one.getVisibility() == View.VISIBLE) {
@@ -315,30 +264,38 @@ public class MainActivity extends ActionBarActivity {
         }
         if (keyCode == KeyEvent.KEYCODE_MENU) {
             if (one.getVisibility() == View.VISIBLE) {
-                one.setVisibility(View.INVISIBLE);
-                two.setVisibility(View.VISIBLE);
-                a.setVisibility(View.VISIBLE);
-                b.setVisibility(View.VISIBLE);
-                c.setVisibility(View.VISIBLE);
-                d.setVisibility(View.VISIBLE);
-                e.setVisibility(View.VISIBLE);
-                f.setVisibility(View.VISIBLE);
+                showbtn();
             } else {
-                two.setVisibility(View.INVISIBLE);
-                a.setVisibility(View.INVISIBLE);
-                b.setVisibility(View.INVISIBLE);
-                c.setVisibility(View.INVISIBLE);
-                d.setVisibility(View.INVISIBLE);
-                e.setVisibility(View.INVISIBLE);
-                f.setVisibility(View.INVISIBLE);
-                one.setVisibility(View.VISIBLE);
+                hidebtn();
             }
-
         }
         return super.onKeyDown(keyCode, event);
     }
 
-    private static final int TIME_INTERVAL = 2000; // # milliseconds, desired time passed between two back presses.
+    private void showbtn() {
+        one.setVisibility(View.INVISIBLE);
+        two.setVisibility(View.VISIBLE);
+        a.setVisibility(View.VISIBLE);
+        b.setVisibility(View.VISIBLE);
+        c.setVisibility(View.VISIBLE);
+        d.setVisibility(View.VISIBLE);
+        e.setVisibility(View.VISIBLE);
+        f.setVisibility(View.VISIBLE);
+    }
+
+    private void hidebtn() {
+        two.setVisibility(View.INVISIBLE);
+        a.setVisibility(View.INVISIBLE);
+        b.setVisibility(View.INVISIBLE);
+        c.setVisibility(View.INVISIBLE);
+        d.setVisibility(View.INVISIBLE);
+        e.setVisibility(View.INVISIBLE);
+        f.setVisibility(View.INVISIBLE);
+        one.setVisibility(View.VISIBLE);
+    }
+
+
+    private static final int TIME_INTERVAL = 2000;
     private long mBackPressed;
 
     @Override
@@ -362,27 +319,40 @@ public class MainActivity extends ActionBarActivity {
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
     }
 
-    public void parse() {// parse code
+    // parse code
+    public void parse() {
         try {
             Bundle extras = getIntent().getExtras();
             if (extras != null) {
                 String jsonData = extras.getString("com.parse.Data");
                 JSONObject json = new JSONObject(jsonData);
                 pushStore = json.getString("alert");
-                final Intent a = new Intent(MainActivity.this, Notif.class);
+                activity = json.getString("activity");
+                Intent a = new Intent(MainActivity.this, Notif.class);
                 startActivity(a);
+                if (activity.equals("check")) {
+                    Intent c = new Intent(MainActivity.this, Check.class);
+                    startActivity(c);
+                }
             }
         } catch (JSONException e) {
         }
     }
-    /* case R.id.downloads:
-         Uri uri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
-                + "");
-         Intent open = new Intent(Intent.ACTION_VIEW);
-          open.setDataAndType(uri, "audio/mpeg");
-          startActivity(Intent.createChooser(open, "Open downloaded files"));
-         return true;
-        case R.id.exit:
-            finish();}return super.onOptionsItemSelected(item);}*/
-
+    //downloading files using external browser
+      /*  myWebView.setDownloadListener(new DownloadListener() {
+            public void onDownloadStart(String url, String userAgent,
+                                        String contentDisposition, String mimetype,
+                                        long contentLength) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+        });*/
+        /*  Handler h = new Handler();
+                h.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // DO DELAYED STUFF
+                    }
+                }, 3000);*/
 }

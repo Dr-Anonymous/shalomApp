@@ -2,11 +2,13 @@ package in.shalomworshipcentre.shalom;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -16,7 +18,7 @@ import android.widget.Toast;
 import java.util.concurrent.TimeUnit;
 
 public class MyMediaPlayer extends Activity implements SeekBar.OnSeekBarChangeListener {
-    public TextView songName, duration, total;
+    TextView songName, duration, total;
     private int forwardTime = 10000, backwardTime = 10000, boolMusicPlaying = 0, seekMax, seekProgress;
     private SeekBar seekBar;
     private double counter, mediamax;
@@ -38,12 +40,11 @@ public class MyMediaPlayer extends Activity implements SeekBar.OnSeekBarChangeLi
             inten = new Intent(BROADCAST_playpause);
             initViews();
             setListeners();
-            buttonPlayPauseClick();
+            ppp();
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(),
-                    e.getClass().getName() + " " + e.getMessage(),
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), e.getClass().getName() + " " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
+
     }
 
 
@@ -92,53 +93,46 @@ public class MyMediaPlayer extends Activity implements SeekBar.OnSeekBarChangeLi
         buttonPlayPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (boolMusicPlaying == 0) {
-                    buttonPlayPauseClick();
-                    return;
-                }
-                if (boolMusicPlaying == 1) {
-                    pauseButton();
-                    return;
-                }
-                if (boolMusicPlaying == 2) {
-                    playAfterPause();
-                    return;
-                }
-                if (boolMusicPlaying == 3) {
-                    finish();
-                }
+                ppp();
             }
         });
         seekBar.setOnSeekBarChangeListener(this);
-
     }
 
-    // --- invoked from ButtonPlayStop listener above ----
-    public void buttonPlayPauseClick() {
-        buttonPlayPause.setBackgroundResource(R.drawable.pausebuttonsm);
-        playAudio();
-        boolMusicPlaying = 1;
-    }
-
-    public void pauseButton() {
-        buttonPlayPause.setBackgroundResource(R.drawable.playbuttonsm);
-        inten.putExtra("pauseplay", 1);
-        sendBroadcast(inten);
-        boolMusicPlaying = 2;
-    }
-
-    public void playAfterPause() {
-        buttonPlayPause.setBackgroundResource(R.drawable.pausebuttonsm);
-        inten.putExtra("pauseplay", 2);
-        sendBroadcast(inten);
-        boolMusicPlaying = 1;
+    private void ppp() {
+        if (boolMusicPlaying == 0) {
+            buttonPlayPause.setBackgroundResource(R.drawable.pausebuttonsm);
+            playAudio();
+            boolMusicPlaying = 1;
+            return;
+        }
+        if (boolMusicPlaying == 1) {
+            am.abandonAudioFocus(afChangeListener);
+            am.unregisterMediaButtonEventReceiver(RemoteControlReceiver);
+            buttonPlayPause.setBackgroundResource(R.drawable.playbuttonsm);
+            inten.putExtra("pauseplay", 1);
+            sendBroadcast(inten);
+            boolMusicPlaying = 2;
+            return;
+        }
+        if (boolMusicPlaying == 2) {
+            audioFocus();
+            buttonPlayPause.setBackgroundResource(R.drawable.pausebuttonsm);
+            inten.putExtra("pauseplay", 2);
+            sendBroadcast(inten);
+            boolMusicPlaying = 1;
+            return;
+        }
+        if (boolMusicPlaying == 3) {
+            finish();
+        }
     }
 
     public void stop(View view) {
         stop();
     }
 
-    public void stop() {
+    private void stop() {
         buttonPlayPause.setBackgroundResource(R.drawable.playbuttonsm);
         stopMyPlayService();
     }
@@ -147,7 +141,7 @@ public class MyMediaPlayer extends Activity implements SeekBar.OnSeekBarChangeLi
         close();
     }
 
-    public void close() {
+    private void close() {
         stopMyPlayService();
         super.onBackPressed();
         overridePendingTransition(R.anim.push_up_in, R.anim.push_down_out);
@@ -155,6 +149,8 @@ public class MyMediaPlayer extends Activity implements SeekBar.OnSeekBarChangeLi
 
     // --- Stop service (and music) ---
     public void stopMyPlayService() {
+        am.abandonAudioFocus(afChangeListener);
+        am.unregisterMediaButtonEventReceiver(RemoteControlReceiver);
         // --Unregister broadcastReceiver for seekbar
         if (mBroadcastIsRegistered) {
             try {
@@ -174,15 +170,15 @@ public class MyMediaPlayer extends Activity implements SeekBar.OnSeekBarChangeLi
 
     // --- Start service and play music ---
     private void playAudio() {
-        //stopMyPlayService();
+        audioFocus();
         try {
             startService(serviceIntent);
+            songName.setText(FileBrowser.name);
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), e.getClass().getName() + " " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
         // -- Register receiver for seekbar--
-        registerReceiver(broadcastReceiver, new IntentFilter(
-                myPlayService.BROADCAST_ACTION));
+        registerReceiver(broadcastReceiver, new IntentFilter(myPlayService.BROADCAST_ACTION));
         mBroadcastIsRegistered = true;
     }
 
@@ -208,9 +204,7 @@ public class MyMediaPlayer extends Activity implements SeekBar.OnSeekBarChangeLi
 
 
     public void vol(View view) {
-        AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audio.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-                AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
+        am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
     }
 
     public void ff(View view) {
@@ -242,7 +236,6 @@ public class MyMediaPlayer extends Activity implements SeekBar.OnSeekBarChangeLi
         }
     }
 
-
     // --- The following two methods are alternatives to track seekbar if moved.
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
@@ -252,12 +245,43 @@ public class MyMediaPlayer extends Activity implements SeekBar.OnSeekBarChangeLi
     public void onStopTrackingTouch(SeekBar seekBar) {
     }
 
+    AudioManager am;
+    ComponentName RemoteControlReceiver;
 
-    // when pressed on blank screen
+    private void audioFocus() {
+        am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        RemoteControlReceiver = new ComponentName(getPackageName(), RemoteControlReceiver.class.getName());
+        // Request audio focus for playback
+        int result = am.requestAudioFocus(afChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            am.registerMediaButtonEventReceiver(RemoteControlReceiver);
+            //Toast.makeText(getApplicationContext(), "Focus init gained", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    AudioManager.OnAudioFocusChangeListener afChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        public void onAudioFocusChange(int focusChange) {
+            if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                // Pause playback
+                //Toast.makeText(getApplicationContext(), "Focus trans", Toast.LENGTH_LONG).show();
+                ppp();
+            } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                Toast.makeText(getApplicationContext(), "Focus gain", Toast.LENGTH_LONG).show();
+                // Resume playback
+                ppp();
+            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                stop();
+                //Toast.makeText(getApplicationContext(), "Focus lost", Toast.LENGTH_LONG).show();
+                //am.unregisterMediaButtonEventReceiver(RemoteControlReceiver);
+                // am.abandonAudioFocus(afChangeListener);
+            }
+        }
+    };
+
+    // when pressed on dark screen
     public void finish(View view) {
         onBackPressed();
     }
-
 
     @Override
     public void onBackPressed() {
@@ -265,4 +289,13 @@ public class MyMediaPlayer extends Activity implements SeekBar.OnSeekBarChangeLi
         overridePendingTransition(R.anim.push_up_in, R.anim.push_down_out);
     }
 
+    @Override
+    public void onDestroy() {
+        try {
+            close();
+        } catch (Exception e) {
+        }
+        super.onDestroy();
+
+    }
 }

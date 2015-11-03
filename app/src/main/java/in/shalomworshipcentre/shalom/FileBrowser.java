@@ -48,7 +48,7 @@ public class FileBrowser extends ListActivity {
                 }
             }
         } else {
-            textView.setText("No Downloads");
+            textView.setText("No downloads");
         }
         Collections.sort(values);
 

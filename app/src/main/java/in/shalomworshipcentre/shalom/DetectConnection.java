@@ -3,7 +3,6 @@ package in.shalomworshipcentre.shalom;
 import android.content.Context;
 import android.net.ConnectivityManager;
 
-
 public class DetectConnection {
 
     public static boolean checkInternetConnection(Context context) {

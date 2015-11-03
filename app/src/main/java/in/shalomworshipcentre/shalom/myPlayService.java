@@ -40,8 +40,7 @@ public class myPlayService extends Service implements OnCompletionListener,
     // ---Variables for seekbar processing---
     String sntSeekPos;
     int intSeekPos;
-    int mediaPosition;
-    int mediaMax;
+    int mediaPosition, mediaMax;
     private final Handler handler = new Handler();
     private static int songEnded;
     public static final String BROADCAST_ACTION = "seekprogress";

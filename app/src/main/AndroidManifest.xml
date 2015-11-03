@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="in.shalomworshipcentre.shalom"
     android:versionCode="1"
-    android:versionName="3.1">
+    android:versionName="3.2">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -67,7 +67,11 @@
             android:launchMode="singleInstance"
             android:parentActivityName=".FileBrowser"
             android:theme="@style/Theme.Transparent"></activity>
-
+        <receiver android:name=".RemoteControlReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
         <service
             android:name=".myPlayService"
             android:enabled="true" />

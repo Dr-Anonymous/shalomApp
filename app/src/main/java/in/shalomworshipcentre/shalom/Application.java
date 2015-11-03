@@ -21,7 +21,6 @@ public class Application extends android.app.Application {
         Parse.enableLocalDatastore(this);
         // Initialize the Parse SDK.
         Parse.initialize(this, "lOjfvl6jcyvHNSFBOHiyID78lJyFYq09SqyBh8CJ", "PHisWmIVwRHFtdX6VmTZOVr4o2V3yWqKWvSowvkn");
-        //PushService.setDefaultPushCallback(this, MainActivity.class);
         ParseInstallation.getCurrentInstallation().saveInBackground();
         ParsePush.subscribeInBackground("shalom", new SaveCallback() {
             @Override

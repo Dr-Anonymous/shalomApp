@@ -12,6 +12,7 @@ import com.parse.SaveCallback;
 
 public class Application extends android.app.Application {
     public static final String TODO_GROUP_NAME = "ALL_TODOS";
+    boolean notif;
 
     @Override
     public void onCreate() {
@@ -22,16 +23,12 @@ public class Application extends android.app.Application {
         // Initialize the Parse SDK.
         Parse.initialize(this, "lOjfvl6jcyvHNSFBOHiyID78lJyFYq09SqyBh8CJ", "PHisWmIVwRHFtdX6VmTZOVr4o2V3yWqKWvSowvkn");
         ParseInstallation.getCurrentInstallation().saveInBackground();
-        ParsePush.subscribeInBackground("shalom", new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                } else {
-                    Log.e("com.parse.push", "failed to subscribe for push", e);
-                }
-            }
-        });
 
+        notif = getSharedPreferences(About.settings, MODE_PRIVATE).getBoolean("notif", true);
+        if (notif) {
+            ParsePush.subscribeInBackground("shalom");
+        } else {
+            ParsePush.unsubscribeInBackground("shalom");
+        }
     }
-
 }

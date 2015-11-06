@@ -25,6 +25,7 @@
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="@android:style/Widget.ProgressBar.Inverse"
         android:layout_centerInParent="true" />
     <View
         android:id="@+id/v"

@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="in.shalomworshipcentre.shalom"
     android:versionCode="1"
-    android:versionName="3.2">
+    android:versionName="3.3">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -49,6 +49,7 @@
             android:label="Check Updates"></activity>
         <activity
             android:name=".Notif"
+            android:screenOrientation="portrait"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="Notifications"></activity>
         <activity

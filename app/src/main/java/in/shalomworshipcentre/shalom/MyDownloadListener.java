@@ -44,18 +44,15 @@ public class MyDownloadListener implements DownloadListener {
                 Intent fileIntent = new Intent(Intent.ACTION_VIEW);
 
                 // Grabs the Uri for the file that was downloaded.
-                Uri mostRecentDownload =
-                        mDownloadManager.getUriForDownloadedFile(mDownloadedFileID);
+                Uri mostRecentDownload = mDownloadManager.getUriForDownloadedFile(mDownloadedFileID);
                 // DownloadManager stores the Mime Type. Makes it really easy for us.
-                String mimeType =
-                        mDownloadManager.getMimeTypeForDownloadedFile(mDownloadedFileID);
+                String mimeType = mDownloadManager.getMimeTypeForDownloadedFile(mDownloadedFileID);
                 fileIntent.setDataAndType(mostRecentDownload, mimeType);
                 fileIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 try {
                     mContext.startActivity(fileIntent);
                 } catch (ActivityNotFoundException e) {
-                    Toast.makeText(mContext, "No handler for this type of file.",
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, "No handler for this type of file.", Toast.LENGTH_LONG).show();
                 }
                 // Sets up the prevention of an unintentional call. I found it necessary. Maybe not for others.
                 mDownloadedFileID = -1;

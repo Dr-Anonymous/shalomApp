@@ -12,6 +12,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
+import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -20,6 +21,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.parse.ParseException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,9 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private ImageView f = null;
     private FrameLayout mContainer;
     private WebView myWebView, mWebviewPop;
-    static String homeUrl, pushStore, activity;
+    String homeUrl, pushStore;
     private ProgressBar progress;
-    boolean smart, isFirstRun;
+    boolean smart, isFirstRun, download;
     WebSettings webSettings;
 
     @Override
@@ -164,14 +167,28 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setDisplayZoomControls(false);
 
         // smartHome url or not
-        smart = getSharedPreferences(About.settingsTAG, MODE_PRIVATE).getBoolean("smart", false);
+        smart = getSharedPreferences(About.settings, MODE_PRIVATE).getBoolean("smart", false);
         if (smart) {
             homeUrl = "http://shalomworshipcentre.in/mobile.html";
         } else {
             homeUrl = "http://shalomworshipcentre.in/";
         }
         myWebView.loadUrl(homeUrl);
-        myWebView.setDownloadListener(new MyDownloadListener(myWebView.getContext()));
+
+        //downloading files using external browser or internal download listner
+        download = getSharedPreferences(About.settings, MODE_PRIVATE).getBoolean("download", false);
+        if (download) {
+            myWebView.setDownloadListener(new DownloadListener() {
+                public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(url));
+                    startActivity(i);
+                }
+            });
+        } else {
+            myWebView.setDownloadListener(new MyDownloadListener(myWebView.getContext()));
+        }
+
         // push notifications-
         parse();
     }
@@ -181,12 +198,6 @@ public class MainActivity extends AppCompatActivity {
         public boolean shouldOverrideUrlLoading(WebView view, final String url) {
             String host = Uri.parse(url).getHost();
             if (host.contains("shalomworshipcentre.in") || host.contains("facebook")) {
-                // This is my web site, so do not override; let my WebView load
-               /* if (mWebviewPop != null) {
-                    mWebviewPop.setVisibility(View.GONE);
-                    mContainer.removeView(mWebviewPop);
-                    mWebviewPop = null;
-                }*/
                 return false;
             }
             // Otherwise, the link is not for a page on my site
@@ -233,13 +244,32 @@ public class MainActivity extends AppCompatActivity {
             webSettings.setDisplayZoomControls(false);
             mWebviewPop.setWebViewClient(new UriWebViewClient());
             webSettings.setJavaScriptEnabled(true);
+            webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
             mContainer.addView(mWebviewPop);
+            if (download) {
+                mWebviewPop.setDownloadListener(new DownloadListener() {
+                    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(url));
+                        startActivity(i);
+                    }
+                });
+            } else {
+                mWebviewPop.setDownloadListener(new MyDownloadListener(myWebView.getContext()));
+            }
             WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
             transport.setWebView(mWebviewPop);
             resultMsg.sendToTarget();
             return true;
         }
+        // remove new added webview whenever onCloseWindow gets called -- not working.
+        @Override
+        public void onCloseWindow(WebView window) {
+            mWebviewPop.setVisibility(View.GONE);
+            myWebView.setVisibility(View.VISIBLE);
+        }
     }
+
 
     // functions of back & menu hard keys
     @Override
@@ -327,27 +357,18 @@ public class MainActivity extends AppCompatActivity {
                 String jsonData = extras.getString("com.parse.Data");
                 JSONObject json = new JSONObject(jsonData);
                 pushStore = json.getString("alert");
-                activity = json.getString("activity");
-                Intent a = new Intent(MainActivity.this, Notif.class);
-                startActivity(a);
-                if (activity.equals("check")) {
-                    Intent c = new Intent(MainActivity.this, Check.class);
-                    startActivity(c);
+                if (json.getString("alert").equals("update available")) {
+                    Intent a = new Intent(MainActivity.this, Check.class);
+                    startActivity(a);
+                } else {
+                    Intent a = new Intent(MainActivity.this, Notif.class);
+                    a.putExtra("txt", pushStore);
+                    startActivity(a);
                 }
             }
         } catch (JSONException e) {
         }
     }
-    //downloading files using external browser
-      /*  myWebView.setDownloadListener(new DownloadListener() {
-            public void onDownloadStart(String url, String userAgent,
-                                        String contentDisposition, String mimetype,
-                                        long contentLength) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
-            }
-        });*/
         /*  Handler h = new Handler();
                 h.postDelayed(new Runnable() {
                     @Override

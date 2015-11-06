@@ -2,21 +2,79 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#f0f0f0"
     android:orientation="vertical">
 
     <ImageView
         android:id="@+id/logo"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="#ffffffff"
         android:contentDescription="logo"
         android:src="@drawable/logo" />
 
-    <TextView
+    <View
+        android:id="@+id/v"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="35dp"
+        android:background="#000000"></View>
+
+    <CheckBox
+        android:id="@+id/mySwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_below="@+id/v"
+        android:layout_marginBottom="10dp"
+        android:background="#d1ffffff"
+        android:text="@string/smart"
+        android:textColor="#ff000000"
+        android:textSize="18sp" />
+
+    <View
+        android:id="@+id/v1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/mySwitch"
+        android:background="#000000"></View>
+
+    <CheckBox
+        android:id="@+id/chk"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/v1"
+        android:layout_marginBottom="10dp"
+        android:background="#d1ffffff"
+        android:text="@string/browser"
+        android:textColor="#ff000000"
+        android:textSize="18sp" />
+
+    <View
+        android:id="@+id/v2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/chk"
+        android:background="#000000"></View>
+
+    <CheckBox
+        android:id="@+id/chk2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/v2"
+        android:background="#d1ffffff"
+        android:checked="true"
+        android:paddingBottom="10dp"
+        android:text="@string/push"
+        android:textColor="#ff000000"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/txt1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/chk2"
         android:layout_marginBottom="15dp"
+        android:layout_marginTop="25dp"
         android:background="#d1ffffff"
         android:contentDescription="@string/about"
         android:fontFamily="sans-serif-light"
@@ -30,8 +88,7 @@
         android:id="@+id/txt2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/v1"
-        android:layout_marginBottom="15dp"
+        android:layout_below="@+id/txt1"
         android:background="#d1ffffff"
         android:gravity="center_horizontal|center_vertical"
         android:text="@string/feedback"
@@ -73,41 +130,5 @@
         android:onClick="share"
         android:text="share app"
         android:textColor="#ffffff" />
-
-    <Switch
-        android:id="@+id/mySwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/txt3"
-        android:layout_centerInParent="true"
-        android:background="#d1ffffff"
-        android:text="smartHome"
-        android:textColor="#ff000000"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/txt3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/v2"
-        android:background="#d1ffffff"
-        android:gravity="center_horizontal|center_vertical"
-        android:text="@string/smart"
-        android:textColor="#ff000000"
-        android:textSize="15sp" />
-
-    <View
-        android:id="@+id/v1"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_above="@+id/mySwitch"
-        android:background="#000000"></View>
-
-    <View
-        android:id="@+id/v2"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_above="@+id/btn"
-        android:background="#000000"></View>
 
 </RelativeLayout>

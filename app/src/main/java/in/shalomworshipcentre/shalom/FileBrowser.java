@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -53,8 +54,7 @@ public class FileBrowser extends ListActivity {
         Collections.sort(values);
 
         // Put the data into the list
-        ArrayAdapter adapter = new ArrayAdapter(this,
-                android.R.layout.simple_list_item_2, android.R.id.text1, values);
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_2, android.R.id.text1, values);
         setListAdapter(adapter);
     }
 
@@ -72,13 +72,12 @@ public class FileBrowser extends ListActivity {
             intent.putExtra("path", filename);
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-        }
-        if (filename.endsWith(".mp3")) {
+        } else if (filename.endsWith(".mp3")) {
             Intent newIntent = new Intent(this, MyMediaPlayer.class);
             startActivity(newIntent);
             overridePendingTransition(R.anim.push_up_in, R.anim.push_up_out);
         } else {
-            Toast.makeText(this, "Use native file browser.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Sorry, cant open this file.", Toast.LENGTH_SHORT).show();
         }
     }
 

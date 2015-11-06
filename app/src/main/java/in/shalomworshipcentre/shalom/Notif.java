@@ -2,16 +2,26 @@ package in.shalomworshipcentre.shalom;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.parse.ConfigCallback;
+import com.parse.GetDataCallback;
+import com.parse.ParseConfig;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
@@ -22,16 +32,20 @@ public class Notif extends Activity {
     private ParseQueryAdapter<Todo> todoListAdapter;
     private LayoutInflater inflater;
     // For showing empty and non-empty todo views
-    private ListView todoListView;
-    private LinearLayout noTodosView;
+    ListView todoListView;
+    TextView server;
     public Todo todo;
+    String text;
+    ImageView pic;
+    ProgressBar progressBar;
+    ParseFile file;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         try {
             todo = new Todo();
             todo.setUuidString();
-            todo.setTitle(MainActivity.pushStore);
+            todo.setTitle(getIntent().getStringExtra("txt"));
             todo.setDraft(true);
             todo.pinInBackground(Application.TODO_GROUP_NAME,
                     new SaveCallback() {
@@ -51,8 +65,14 @@ public class Notif extends Activity {
         setContentView(R.layout.activity_todo_list);
         // Set up the views
         todoListView = (ListView) findViewById(R.id.todo_list_view);
-        noTodosView = (LinearLayout) findViewById(R.id.no_todos_view);
-        todoListView.setEmptyView(noTodosView);
+        server = (TextView) findViewById(R.id.config);
+        pic = (ImageView) findViewById(R.id.pic);
+        todo();
+        config();
+
+    }
+
+    private void todo() {
 
         // Set up the Parse query to use in the adapter
         ParseQueryAdapter.QueryFactory<Todo> factory = new ParseQueryAdapter.QueryFactory<Todo>() {
@@ -67,12 +87,43 @@ public class Notif extends Activity {
         inflater = (LayoutInflater) this
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         todoListAdapter = new ToDoListAdapter(this, factory);
-
         // Attach the query adapter to the view
-        ListView todoListView = (ListView) findViewById(R.id.todo_list_view);
         todoListView.setAdapter(todoListAdapter);
     }
 
+    private void config() {
+        ParseConfig.getInBackground(new ConfigCallback() {
+            @Override
+            public void done(ParseConfig config, ParseException e) {
+                if (e == null) {
+                    text = config.getString("text", "");
+                    file = config.getParseFile("pic");
+                    img();
+                } else {
+                    text = (ParseConfig.getCurrentConfig()).getString("text", "");
+                    try {
+                        file = (ParseConfig.getCurrentConfig()).getParseFile("pic");
+                        img();
+                    } catch (Exception h) {
+                        server.setText(text);
+                    }
+                }
+                progressBar = (ProgressBar) findViewById(R.id.progress);
+                progressBar.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void img() {
+        file.getDataInBackground(new GetDataCallback() {
+            @Override
+            public void done(byte[] data, com.parse.ParseException e) {
+                Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                pic.setImageBitmap(bmp);
+                server.setText(text);
+            }
+        });
+    }
 
     private class ToDoListAdapter extends ParseQueryAdapter<Todo> {
 
@@ -109,6 +160,8 @@ public class Notif extends Activity {
         ParseObject.unpinAllInBackground(Application.TODO_GROUP_NAME);
         // Clear the view
         todoListAdapter.clear();
+        server.setVisibility(View.GONE);
+        pic.setVisibility(View.GONE);
     }
 
     @Override
@@ -116,5 +169,4 @@ public class Notif extends Activity {
         super.onBackPressed();
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
-
 }

@@ -2,10 +2,14 @@ package in.shalomworshipcentre.shalom;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,7 +22,7 @@ import java.util.List;
 
 public class FileBrowser extends ListActivity {
     private String path;
-    public static String filename, name;
+    public static String filename, name, part2;
     TextView textView;
 
     @Override
@@ -34,12 +38,13 @@ public class FileBrowser extends ListActivity {
             path = getIntent().getStringExtra("path");
         }
         setTitle(path);
+        textView.setText(path);
 
         // Read all files sorted into the values-array
         List values = new ArrayList();
         File dir = new File(path);
         if (!dir.canRead()) {
-            setTitle(getTitle() + " (inaccessible)");
+            setTitle(getTitle() + " inaccessible");
         }
         String[] list = dir.list();
         if (list != null) {
@@ -49,7 +54,12 @@ public class FileBrowser extends ListActivity {
                 }
             }
         } else {
-            textView.setText("No downloads");
+            path = Environment.getExternalStorageDirectory()
+                    + "/download";
+            Intent intent = new Intent(this, FileBrowser.class);
+            intent.putExtra("path", path);
+            startActivity(intent);
+            finish();
         }
         Collections.sort(values);
 
@@ -72,13 +82,40 @@ public class FileBrowser extends ListActivity {
             intent.putExtra("path", filename);
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-        } else if (filename.endsWith(".mp3")) {
+            finish();
+        } else if (filename.endsWith("mp3") || filename.endsWith("m4a") || filename.endsWith("flac") || filename.endsWith("wav") || filename.endsWith("wma") || filename.endsWith("ogg")) {
             Intent newIntent = new Intent(this, MyMediaPlayer.class);
             startActivity(newIntent);
             overridePendingTransition(R.anim.push_up_in, R.anim.push_up_out);
         } else {
             Toast.makeText(this, "Sorry, cant open this file.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void back() {
+        // invert filename
+        path = new StringBuffer(path).reverse().toString();
+        // take off first part at /
+        String[] parts = path.split("/", 2);
+        part2 = parts[1];
+        // re invert part 2
+        path = new StringBuffer(part2).reverse().toString();
+        Intent intent = new Intent(this, FileBrowser.class);
+        intent.putExtra("path", path);
+        startActivity(intent);
+        finish();
+    }
+
+    public void goBack(View view) {
+       /* if (path == null) {  //this not checked
+            back();
+        } else*/
+        if (path.equals("/storage")) {
+            super.onBackPressed();
+        } else {
+            back();
+        }
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
     @Override

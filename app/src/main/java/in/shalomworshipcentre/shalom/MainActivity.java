@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
@@ -30,7 +32,6 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
     private ImageView one = null;
-    private ImageView two = null;
     private ImageView a = null;
     private ImageView b = null;
     private ImageView c = null;
@@ -69,12 +70,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 showbtn();
 
-            }
-        });
-        two = (ImageView) findViewById(R.id.hide);
-        two.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                hidebtn();
             }
         });
         a = (ImageView) findViewById(R.id.a);
@@ -129,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent browse = new Intent(MainActivity.this, FileBrowser.class);
                 startActivity(browse);
-                overridePendingTransition(R.anim.push_up_in, R.anim.push_up_out);
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
             }
         });
 
@@ -262,6 +257,7 @@ public class MainActivity extends AppCompatActivity {
             resultMsg.sendToTarget();
             return true;
         }
+
         // remove new added webview whenever onCloseWindow gets called -- not working.
         @Override
         public void onCloseWindow(WebView window) {
@@ -304,7 +300,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void showbtn() {
         one.setVisibility(View.INVISIBLE);
-        two.setVisibility(View.VISIBLE);
         a.setVisibility(View.VISIBLE);
         b.setVisibility(View.VISIBLE);
         c.setVisibility(View.VISIBLE);
@@ -314,7 +309,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void hidebtn() {
-        two.setVisibility(View.INVISIBLE);
         a.setVisibility(View.INVISIBLE);
         b.setVisibility(View.INVISIBLE);
         c.setVisibility(View.INVISIBLE);

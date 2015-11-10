@@ -63,8 +63,27 @@
         android:layout_below="@id/v2"
         android:background="#d1ffffff"
         android:checked="true"
-        android:paddingBottom="10dp"
+        android:layout_marginBottom="10dp"
         android:text="@string/push"
+        android:textColor="#ff000000"
+        android:textSize="18sp" />
+
+    <View
+        android:id="@+id/v3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/chk2"
+        android:background="#000000"></View>
+
+    <CheckBox
+        android:id="@+id/chk3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/v3"
+        android:background="#d1ffffff"
+        android:checked="true"
+        android:paddingBottom="10dp"
+        android:text="@string/audio"
         android:textColor="#ff000000"
         android:textSize="18sp" />
 
@@ -72,7 +91,7 @@
         android:id="@+id/txt1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/chk2"
+        android:layout_below="@+id/chk3"
         android:layout_marginBottom="15dp"
         android:layout_marginTop="25dp"
         android:background="#d1ffffff"

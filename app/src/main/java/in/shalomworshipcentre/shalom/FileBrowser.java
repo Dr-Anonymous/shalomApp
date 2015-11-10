@@ -1,18 +1,23 @@
 package in.shalomworshipcentre.shalom;
 
 import android.app.ListActivity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
+import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.parse.ParsePush;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,6 +29,7 @@ public class FileBrowser extends ListActivity {
     private String path;
     public static String filename, name, part2;
     TextView textView;
+    boolean audio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,14 +43,15 @@ public class FileBrowser extends ListActivity {
         if (getIntent().hasExtra("path")) {
             path = getIntent().getStringExtra("path");
         }
-        setTitle(path);
+        // setTitle(path);
         textView.setText(path);
 
         // Read all files sorted into the values-array
         List values = new ArrayList();
         File dir = new File(path);
         if (!dir.canRead()) {
-            setTitle(getTitle() + " inaccessible");
+            Toast.makeText(this, "inaccessible", Toast.LENGTH_SHORT).show();
+            // setTitle(getTitle() + " inaccessible");
         }
         String[] list = dir.list();
         if (list != null) {
@@ -62,7 +69,6 @@ public class FileBrowser extends ListActivity {
             finish();
         }
         Collections.sort(values);
-
         // Put the data into the list
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_2, android.R.id.text1, values);
         setListAdapter(adapter);
@@ -80,15 +86,58 @@ public class FileBrowser extends ListActivity {
         if (new File(filename).isDirectory()) {
             Intent intent = new Intent(this, FileBrowser.class);
             intent.putExtra("path", filename);
-            startActivity(intent);
-            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-            finish();
-        } else if (filename.endsWith("mp3") || filename.endsWith("m4a") || filename.endsWith("flac") || filename.endsWith("wav") || filename.endsWith("wma") || filename.endsWith("ogg")) {
-            Intent newIntent = new Intent(this, MyMediaPlayer.class);
-            startActivity(newIntent);
-            overridePendingTransition(R.anim.push_up_in, R.anim.push_up_out);
+            try {
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+                finish();
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(this, "No handler for this type of file.", Toast.LENGTH_SHORT).show();
+            }
+        } else if (isSong()) {
+            audio = getSharedPreferences(About.settings, MODE_PRIVATE).getBoolean("audio", true);
+            if (audio) {
+                Intent newIntent = new Intent(this, MyMediaPlayer.class);
+                startActivity(newIntent);
+                overridePendingTransition(R.anim.push_up_in, R.anim.push_up_out);
+            } else {
+                openFile();
+            }
         } else {
-            Toast.makeText(this, "Sorry, cant open this file.", Toast.LENGTH_SHORT).show();
+            openFile();
+        }
+    }
+
+    void openFile() {
+        MimeTypeMap myMime = MimeTypeMap.getSingleton();
+        Intent newIntent = new Intent(Intent.ACTION_VIEW);
+        try {
+            String mimeType = myMime.getMimeTypeFromExtension(fileExt(filename).substring(1));
+            newIntent.setDataAndType(Uri.fromFile(new File(filename)), mimeType);
+            newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            this.startActivity(newIntent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "No handler for this type of file.", Toast.LENGTH_SHORT).show();
+        } catch (NullPointerException n) {
+            Toast.makeText(this, "Can't open this file.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String fileExt(String url) {
+        if (url.contains("?")) {
+            url = url.substring(0, url.indexOf("?"));
+        }
+        if (url.lastIndexOf(".") == -1) {
+            return null;
+        } else {
+            String ext = url.substring(url.lastIndexOf("."));
+            if (ext.contains("%")) {
+                ext = ext.substring(0, ext.indexOf("%"));
+            }
+            if (ext.contains("/")) {
+                ext = ext.substring(0, ext.indexOf("/"));
+            }
+            return ext.toLowerCase();
+
         }
     }
 
@@ -107,9 +156,6 @@ public class FileBrowser extends ListActivity {
     }
 
     public void goBack(View view) {
-       /* if (path == null) {  //this not checked
-            back();
-        } else*/
         if (path.equals("/storage")) {
             super.onBackPressed();
         } else {
@@ -122,5 +168,13 @@ public class FileBrowser extends ListActivity {
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+    }
+
+    public static boolean isSong() {
+        if (filename.endsWith("mp3") || filename.endsWith("m4a") || filename.endsWith("flac") ||
+                filename.endsWith("wav") || filename.endsWith("wma") || filename.endsWith("ogg"))
+            return true;
+        else
+            return false;
     }
 }

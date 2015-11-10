@@ -1,7 +1,9 @@
 package in.shalomworshipcentre.shalom;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
@@ -42,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private WebView myWebView, mWebviewPop;
     String homeUrl, pushStore;
     private ProgressBar progress;
-    boolean smart, isFirstRun, download;
+    static boolean smart, isFirstRun, download;
     WebSettings webSettings;
 
     @Override
@@ -270,23 +272,25 @@ public class MainActivity extends AppCompatActivity {
     // functions of back & menu hard keys
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if ((keyCode == KeyEvent.KEYCODE_BACK) && one.getVisibility() == View.INVISIBLE) {
-            hidebtn();
-            return true;
-        }
-        if ((keyCode == KeyEvent.KEYCODE_BACK) && myWebView.canGoBack() && one.getVisibility() == View.VISIBLE) {
-            myWebView.goBack();
-            return true;
-        }
-        if (keyCode == KeyEvent.KEYCODE_BACK && mWebviewPop != null && mWebviewPop.canGoBack()) {
-            mWebviewPop.goBack();
-            return true;
-        }
-        if (keyCode == KeyEvent.KEYCODE_BACK && mWebviewPop != null && !mWebviewPop.canGoBack()) {
-            mWebviewPop.setVisibility(View.GONE);
-            mContainer.removeView(mWebviewPop);
-            mWebviewPop = null;
-            return true;
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (one.getVisibility() == View.INVISIBLE) {
+                hidebtn();
+                return true;
+            }
+            if (myWebView.canGoBack() && one.getVisibility() == View.VISIBLE) {
+                myWebView.goBack();
+                return true;
+            }
+            if (mWebviewPop != null && mWebviewPop.canGoBack()) {
+                mWebviewPop.goBack();
+                return true;
+            }
+            if (mWebviewPop != null && !mWebviewPop.canGoBack()) {
+                mWebviewPop.setVisibility(View.GONE);
+                mContainer.removeView(mWebviewPop);
+                mWebviewPop = null;
+                return true;
+            }
         }
         if (keyCode == KeyEvent.KEYCODE_MENU) {
             if (one.getVisibility() == View.VISIBLE) {
@@ -334,6 +338,7 @@ public class MainActivity extends AppCompatActivity {
         mBackPressed = System.currentTimeMillis();
     }
 
+
     public void restart() {
         Toast.makeText(MainActivity.this, "Reloading..", Toast.LENGTH_SHORT).show();
         Intent i = getBaseContext().getPackageManager()
@@ -352,8 +357,11 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject json = new JSONObject(jsonData);
                 pushStore = json.getString("alert");
                 if (json.getString("alert").equals("update available")) {
-                    Intent a = new Intent(MainActivity.this, Check.class);
-                    startActivity(a);
+                    if (DetectConnection.checkInternetConnection(MainActivity.this)) {
+                        Intent a = new Intent(MainActivity.this, Check.class);
+                        startActivity(a);
+                    } else
+                        Toast.makeText(MainActivity.this, "Enable internet to view updates", Toast.LENGTH_LONG).show();
                 } else {
                     Intent a = new Intent(MainActivity.this, Notif.class);
                     a.putExtra("txt", pushStore);
@@ -361,6 +369,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         } catch (JSONException e) {
+        } catch (NullPointerException n) {
         }
     }
         /*  Handler h = new Handler();

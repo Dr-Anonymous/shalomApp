@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="in.shalomworshipcentre.shalom"
-    android:versionCode="1"
-    android:versionName="3.3">
+    android:versionCode="2"
+    android:versionName="3.4">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -49,9 +49,9 @@
             android:label="Check Updates"></activity>
         <activity
             android:name=".Notif"
-            android:screenOrientation="portrait"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="Notifications"></activity>
+            android:label="Notifications"
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".New"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -66,13 +66,14 @@
             android:excludeFromRecents="true"
             android:label="Media Player"
             android:launchMode="singleInstance"
-            android:parentActivityName=".FileBrowser"
             android:theme="@style/Theme.Transparent"></activity>
+
         <receiver android:name=".RemoteControlReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+
         <service
             android:name=".myPlayService"
             android:enabled="true" />

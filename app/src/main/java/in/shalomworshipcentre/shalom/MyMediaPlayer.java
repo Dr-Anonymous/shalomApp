@@ -80,10 +80,8 @@ public class MyMediaPlayer extends Activity implements SeekBar.OnSeekBarChangeLi
         setContentView(R.layout.player);
         songName = (TextView) findViewById(R.id.songName);
         seekBar = (SeekBar) findViewById(R.id.seekBar);
-        songName.setText(FileBrowser.name);
         duration = (TextView) findViewById(R.id.songDuration);
         total = (TextView) findViewById(R.id.total);
-
         buttonPlayPause = (Button) findViewById(R.id.media_play);
         buttonPlayPause.setBackgroundResource(R.drawable.playbuttonsm);
     }
@@ -189,6 +187,10 @@ public class MyMediaPlayer extends Activity implements SeekBar.OnSeekBarChangeLi
 
     @Override
     protected void onResume() {
+        if (FileBrowser.isSong() && !songName.getText().equals(FileBrowser.name)) {
+            stop();
+            ppp();
+        }
         super.onResume();
     }
 
@@ -204,7 +206,7 @@ public class MyMediaPlayer extends Activity implements SeekBar.OnSeekBarChangeLi
 
 
     public void vol(View view) {
-        am.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
+        am.adjustStreamVolume(am.STREAM_MUSIC, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI);
     }
 
     public void ff(View view) {
@@ -252,8 +254,8 @@ public class MyMediaPlayer extends Activity implements SeekBar.OnSeekBarChangeLi
         am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         RemoteControlReceiver = new ComponentName(getPackageName(), RemoteControlReceiver.class.getName());
         // Request audio focus for playback
-        int result = am.requestAudioFocus(afChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
-        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+        int result = am.requestAudioFocus(afChangeListener, am.STREAM_MUSIC, am.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
+        if (result == am.AUDIOFOCUS_REQUEST_GRANTED) {
             am.registerMediaButtonEventReceiver(RemoteControlReceiver);
             //Toast.makeText(getApplicationContext(), "Focus init gained", Toast.LENGTH_LONG).show();
         }
@@ -261,15 +263,15 @@ public class MyMediaPlayer extends Activity implements SeekBar.OnSeekBarChangeLi
 
     AudioManager.OnAudioFocusChangeListener afChangeListener = new AudioManager.OnAudioFocusChangeListener() {
         public void onAudioFocusChange(int focusChange) {
-            if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+            if (focusChange == am.AUDIOFOCUS_LOSS_TRANSIENT) {
                 // Pause playback
                 //Toast.makeText(getApplicationContext(), "Focus trans", Toast.LENGTH_LONG).show();
                 ppp();
-            } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+            } else if (focusChange == am.AUDIOFOCUS_GAIN) {
                 Toast.makeText(getApplicationContext(), "Focus gain", Toast.LENGTH_LONG).show();
                 // Resume playback
                 ppp();
-            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+            } else if (focusChange == am.AUDIOFOCUS_LOSS) {
                 stop();
                 //Toast.makeText(getApplicationContext(), "Focus lost", Toast.LENGTH_LONG).show();
                 //am.unregisterMediaButtonEventReceiver(RemoteControlReceiver);

@@ -33,12 +33,10 @@ public class Notif extends Activity {
     private LayoutInflater inflater;
     // For showing empty and non-empty todo views
     ListView todoListView;
-    TextView server;
+    static TextView server;
     public Todo todo;
-    String text;
-    ImageView pic;
-    ProgressBar progressBar;
-    ParseFile file;
+    static ImageView pic;
+    static ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,10 +64,10 @@ public class Notif extends Activity {
         // Set up the views
         todoListView = (ListView) findViewById(R.id.todo_list_view);
         server = (TextView) findViewById(R.id.config);
+        progressBar = (ProgressBar) findViewById(R.id.progress);
         pic = (ImageView) findViewById(R.id.pic);
         todo();
-        config();
-
+        Helper.refreshConfig();
     }
 
     private void todo() {
@@ -89,40 +87,6 @@ public class Notif extends Activity {
         todoListAdapter = new ToDoListAdapter(this, factory);
         // Attach the query adapter to the view
         todoListView.setAdapter(todoListAdapter);
-    }
-
-    private void config() {
-        ParseConfig.getInBackground(new ConfigCallback() {
-            @Override
-            public void done(ParseConfig config, ParseException e) {
-                if (e == null) {
-                    text = config.getString("text", "");
-                    file = config.getParseFile("pic");
-                    img();
-                } else {
-                    text = (ParseConfig.getCurrentConfig()).getString("text", "");
-                    try {
-                        file = (ParseConfig.getCurrentConfig()).getParseFile("pic");
-                        img();
-                    } catch (Exception h) {
-                        server.setText(text);
-                    }
-                }
-                progressBar = (ProgressBar) findViewById(R.id.progress);
-                progressBar.setVisibility(View.GONE);
-            }
-        });
-    }
-
-    private void img() {
-        file.getDataInBackground(new GetDataCallback() {
-            @Override
-            public void done(byte[] data, com.parse.ParseException e) {
-                Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                pic.setImageBitmap(bmp);
-                server.setText(text);
-            }
-        });
     }
 
     private class ToDoListAdapter extends ParseQueryAdapter<Todo> {

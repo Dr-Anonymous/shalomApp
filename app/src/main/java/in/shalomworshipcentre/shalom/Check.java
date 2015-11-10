@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.NetworkOnMainThreadException;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -18,15 +19,24 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class Check extends AppCompatActivity {
-    boolean download;
+    TextView tvVersionName;
+    WebView myWebView;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.check);
-        WebView myWebView = (WebView) findViewById(R.id.check);
+        myWebView = (WebView) findViewById(R.id.check);
         // display current version
         Context context = getApplicationContext(); // or activity.getApplicationContext()
         PackageManager packageManager = context.getPackageManager();
@@ -35,20 +45,14 @@ public class Check extends AppCompatActivity {
         try {
             myVersionName = packageManager.getPackageInfo(packageName, 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
         }
         // set version name to a TextView
-        TextView tvVersionName = (TextView) findViewById(R.id.versionName);
+        tvVersionName = (TextView) findViewById(R.id.versionName);
         tvVersionName.setText("Version installed : " + myVersionName);
-
-        myWebView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         myWebView.setWebChromeClient(new WebChromeClient());
-        myWebView.setWebViewClient(new UriWebViewClient());
-        myWebView.loadUrl("http://shalomworshipcentre.in/appupdate.html");
-
+        myWebView.setWebViewClient(new WebViewClient());
         //downloading files using external browser or internal download listner
-        download = getSharedPreferences(About.settings, MODE_PRIVATE).getBoolean("download", false);
-        if (download) {
+        if (MainActivity.download) {
             myWebView.setDownloadListener(new DownloadListener() {
                 public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
                     Intent i = new Intent(Intent.ACTION_VIEW);
@@ -59,23 +63,24 @@ public class Check extends AppCompatActivity {
         } else {
             myWebView.setDownloadListener(new MyDownloadListener(myWebView.getContext()));
         }
+        myWebView.loadUrl("http://shalomworshipcentre.in/appupdate.html");
+
+        // readWebpage(myWebView);
+
     }
 
-    private class UriWebViewClient extends WebViewClient {
-        @Override
-        public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-            Log.e(String.valueOf(errorCode), description);
-            if (errorCode == -2) {
-                view.loadUrl("file:///android_asset/error.html");
-                return;
-            }
-            super.onReceivedError(view, errorCode, description, failingUrl);
-        }
+    public void readWebpage(View v) {
+        DownloadPage task = new DownloadPage(myWebView);
+        task.execute(new String[]{"http://shalomworshipcentre.in/"});
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        if (myWebView.canGoBack())
+            myWebView.goBack();
+        else {
+            super.onBackPressed();
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        }
     }
 }

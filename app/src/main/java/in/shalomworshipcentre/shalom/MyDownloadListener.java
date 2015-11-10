@@ -24,8 +24,7 @@ public class MyDownloadListener implements DownloadListener {
 
     public MyDownloadListener(Context context) {
         mContext = context;
-        mDownloadManager = (DownloadManager) mContext
-                .getSystemService(Context.DOWNLOAD_SERVICE);
+        mDownloadManager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
     }
 
     @Override
@@ -59,8 +58,7 @@ public class MyDownloadListener implements DownloadListener {
             }
         };
         // Registers function to listen to the completion of the download.
-        mContext.registerReceiver(onComplete, new
-                IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        mContext.registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
         mRequest = new DownloadManager.Request(Uri.parse(url));
         // create the directory if not there
@@ -72,7 +70,7 @@ public class MyDownloadListener implements DownloadListener {
         // Limits the download to only over WiFi. Optional.
         // mRequest.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
         // Makes download visible in notifications while downloading, but disappears after download completes. Optional.
-        mRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+        mRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         mRequest.setMimeType(mimetype);
 
         // If necessary for a security check. I needed it, but I don't think it's mandatory.

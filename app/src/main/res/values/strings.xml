@@ -4,7 +4,8 @@
     <string name="feedback">Please mail your feedback and bug reports to \'shalomworshipcentre.kkd@gmail.com\'</string>
     <string name="notif">No notifications</string>
     <string name="push">Receive push notifications regarding latest info and updates.</string>
+    <string name="audio">Play audio files using inbuilt audio player.</string>
     <string name="smart">Load only latest info from \'Home\' page (for slow data connections).</string>
-    <string name="browser">Download files from the web using other (external) applications.</string>
+    <string name="browser">Download files using other (external) applications.</string>
     <string name="timer">00 : 00</string>
 </resources>

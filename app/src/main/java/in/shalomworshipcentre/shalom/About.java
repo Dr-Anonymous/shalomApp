@@ -12,7 +12,7 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 public class About extends AppCompatActivity {
-    public CheckBox mySwitch, checkBox, checkBox2;
+    public CheckBox mySwitch, checkBox, checkBox2, checkBox3;
     public SharedPreferences prefs;
     public static String settings = "settings";
 
@@ -91,6 +91,23 @@ public class About extends AppCompatActivity {
                 }
             }
         });
+        checkBox3 = (CheckBox) findViewById(R.id.chk3);
+        checkBox3.setChecked(prefs.getBoolean("audio", true));
+        checkBox3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                if (isChecked) {
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putBoolean("audio", true);
+                    editor.commit();
+                } else {
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putBoolean("audio", false);
+                    editor.commit();
+                }
+            }
+        });
 
     }
 
@@ -104,7 +121,7 @@ public class About extends AppCompatActivity {
 
     public void check(View view) {
         if (!DetectConnection.checkInternetConnection(this)) {
-            Toast.makeText(getApplicationContext(), "No Internet! Please enable net and retry", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No Internet! Please enable net and retry", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Checking for Update..", Toast.LENGTH_SHORT)
                     .show();

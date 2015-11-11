@@ -7,19 +7,7 @@
     <FrameLayout
         android:id="@+id/webview_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <WebView
-            android:id="@+id/webviewPop"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:visibility="gone"></WebView>
-
-        <WebView
-            android:id="@+id/main"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"></WebView>
-    </FrameLayout>
+        android:layout_height="match_parent"></FrameLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"

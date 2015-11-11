@@ -7,7 +7,8 @@ import android.content.Intent;
 import android.view.KeyEvent;
 
 public class RemoteControlReceiver extends BroadcastReceiver {
-boolean pp;
+    boolean pp;
+
     public RemoteControlReceiver() {
         super();
     }

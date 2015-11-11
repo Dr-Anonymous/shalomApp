@@ -1,20 +1,15 @@
 package in.shalomworshipcentre.shalom;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
@@ -24,9 +19,8 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
-
-import com.parse.ParseException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,11 +35,15 @@ public class MainActivity extends AppCompatActivity {
     private ImageView e = null;
     private ImageView f = null;
     private FrameLayout mContainer;
-    private WebView myWebView, mWebviewPop;
+    private WebView myWebView, popupView;
     String homeUrl, pushStore;
     private ProgressBar progress;
     static boolean smart, isFirstRun, download;
     WebSettings webSettings;
+    /*LoginButton loginButton;
+    CallbackManager callbackManager;
+    AccessTokenTracker accessTokenTracker;
+    AccessToken accessToken;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +60,9 @@ public class MainActivity extends AppCompatActivity {
         // layout initialising
         setContentView(R.layout.activity_main);
         mContainer = (FrameLayout) findViewById(R.id.webview_frame);
-        myWebView = (WebView) findViewById(R.id.main);
-        mWebviewPop = (WebView) findViewById(R.id.webviewPop);
         progress = (ProgressBar) findViewById(R.id.progressBar);
         progress.setVisibility(View.GONE);
+        //loginButton = (LoginButton) findViewById(R.id.login_button);
 
         one = (ImageView) findViewById(R.id.show);
         one.setOnClickListener(new View.OnClickListener() {
@@ -136,6 +133,12 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        // layout params applied to the webviews in order to fit 100% the parent container
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+
+        myWebView = new WebView(this);
+        myWebView.setLayoutParams(layoutParams);
+        mContainer.addView(myWebView);
         //Enabling JavaScript
         webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -143,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setSupportMultipleWindows(true);
         CookieManager.getInstance().setAcceptCookie(true);
         //chrome client
-        myWebView.setWebChromeClient(new UriChromeClient());
+        myWebView.setWebChromeClient(new MyChromeClient(MainActivity.this, myWebView, mContainer));
         // Function to load URLs in same webview
         myWebView.setWebViewClient(new UriWebViewClient());
         //allow file access
@@ -175,24 +178,70 @@ public class MainActivity extends AppCompatActivity {
         //downloading files using external browser or internal download listner
         download = getSharedPreferences(About.settings, MODE_PRIVATE).getBoolean("download", false);
         if (download) {
-            myWebView.setDownloadListener(new DownloadListener() {
-                public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-                    Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setData(Uri.parse(url));
-                    startActivity(i);
-                }
-            });
+            getFile(myWebView);
         } else {
             myWebView.setDownloadListener(new MyDownloadListener(myWebView.getContext()));
         }
-
+        //    fb();
         // push notifications-
         parse();
     }
 
+    public class MyChromeClient extends WebChromeClient {
+
+        protected Activity activity;
+        protected WebView parentWebView;
+        protected FrameLayout container;
+
+        MyChromeClient(
+                Activity activity,
+                WebView parentWebView,
+                FrameLayout container
+        ) {
+            super();
+            this.activity = activity;
+            this.parentWebView = parentWebView;
+            this.container = container;
+        }
+
+        @Override
+        public boolean onCreateWindow(WebView view, boolean dialog, boolean userGesture, Message resultMsg) {
+            popupView = new WebView(this.activity);
+
+            // setup popuview and add
+            webSettings = popupView.getSettings();
+            webSettings.setJavaScriptEnabled(true);
+            webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+            webSettings.setSupportMultipleWindows(true);
+            popupView.setWebChromeClient(this);
+            popupView.setWebViewClient(new UriWebViewClient());
+            popupView.setLayoutParams(new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.MATCH_PARENT
+            ));
+            this.container.addView(popupView);
+            if (download) {
+                getFile(popupView);
+            } else {
+                popupView.setDownloadListener(new MyDownloadListener(popupView.getContext()));
+            }
+            // send popup window infos back to main (cross-document messaging)
+            WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+            transport.setWebView(popupView);
+            resultMsg.sendToTarget();
+            return true;
+        }
+
+        // remove new added webview on close
+        @Override
+        public void onCloseWindow(WebView window) {
+            popupView.setVisibility(WebView.GONE);
+        }
+    }
+
     private class UriWebViewClient extends WebViewClient {
         @Override
-        public boolean shouldOverrideUrlLoading(WebView view, final String url) {
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
             String host = Uri.parse(url).getHost();
             if (host.contains("shalomworshipcentre.in") || host.contains("facebook")) {
                 return false;
@@ -231,43 +280,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    class UriChromeClient extends WebChromeClient {
-        @Override
-        public boolean onCreateWindow(WebView view, boolean isDialog,
-                                      boolean isUserGesture, Message resultMsg) {
-            mWebviewPop = new WebView(MainActivity.this);
-            WebSettings webSettings = mWebviewPop.getSettings();
-            webSettings.setBuiltInZoomControls(true);
-            webSettings.setDisplayZoomControls(false);
-            mWebviewPop.setWebViewClient(new UriWebViewClient());
-            webSettings.setJavaScriptEnabled(true);
-            webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
-            mContainer.addView(mWebviewPop);
-            if (download) {
-                mWebviewPop.setDownloadListener(new DownloadListener() {
-                    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-                        Intent i = new Intent(Intent.ACTION_VIEW);
-                        i.setData(Uri.parse(url));
-                        startActivity(i);
-                    }
-                });
-            } else {
-                mWebviewPop.setDownloadListener(new MyDownloadListener(myWebView.getContext()));
-            }
-            WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
-            transport.setWebView(mWebviewPop);
-            resultMsg.sendToTarget();
-            return true;
-        }
-
-        // remove new added webview whenever onCloseWindow gets called -- not working.
-        @Override
-        public void onCloseWindow(WebView window) {
-            mWebviewPop.setVisibility(View.GONE);
-            myWebView.setVisibility(View.VISIBLE);
-        }
-    }
-
 
     // functions of back & menu hard keys
     @Override
@@ -281,14 +293,14 @@ public class MainActivity extends AppCompatActivity {
                 myWebView.goBack();
                 return true;
             }
-            if (mWebviewPop != null && mWebviewPop.canGoBack()) {
-                mWebviewPop.goBack();
+            if (popupView != null && popupView.canGoBack()) {
+                popupView.goBack();
                 return true;
             }
-            if (mWebviewPop != null && !mWebviewPop.canGoBack()) {
-                mWebviewPop.setVisibility(View.GONE);
-                mContainer.removeView(mWebviewPop);
-                mWebviewPop = null;
+            if (popupView != null && !popupView.canGoBack()) {
+                popupView.setVisibility(View.GONE);
+                mContainer.removeView(popupView);
+                popupView = null;
                 return true;
             }
         }
@@ -348,6 +360,66 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
     }
 
+   /* public void fb() {
+        loginButton.setReadPermissions("user_friends");
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
+        accessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(
+                    AccessToken oldAccessToken,
+                    AccessToken currentAccessToken) {
+                // Set the access token using
+                // currentAccessToken when it's loaded or set.
+            }
+        };
+        // If the access token is available already assign it.
+        accessToken = AccessToken.getCurrentAccessToken();
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                // App code
+            }
+
+            @Override
+            public void onCancel() {
+                // App code
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                // App code
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Logs 'install' and 'app activate' App Events.
+        AppEventsLogger.activateApp(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Logs 'app deactivate' App Event.
+        AppEventsLogger.deactivateApp(this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        accessTokenTracker.stopTracking();
+    }*/
+
+
     // parse code
     public void parse() {
         try {
@@ -371,6 +443,16 @@ public class MainActivity extends AppCompatActivity {
         } catch (JSONException e) {
         } catch (NullPointerException n) {
         }
+    }
+
+    public void getFile(WebView view) {
+        view.setDownloadListener(new DownloadListener() {
+            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+        });
     }
         /*  Handler h = new Handler();
                 h.postDelayed(new Runnable() {

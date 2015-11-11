@@ -28,8 +28,12 @@
         android:allowBackup="true"
         android:configChanges="keyboardHidden|orientation|screenSize"
         android:icon="@drawable/appicon"
-        android:label="Shalom"
+        android:label="@string/app_name"
         android:theme="@style/AppTheme">
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/fbid" />
+
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -42,31 +46,36 @@
         <activity
             android:name=".About"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="About"></activity>
+            android:label="About" />
         <activity
             android:name=".Check"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="Check Updates"></activity>
+            android:label="Check Updates" />
         <activity
             android:name=".Notif"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="Notifications"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".New"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="New"></activity>
+            android:label="New" />
         <activity
             android:name=".FileBrowser"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="File Browesr"></activity>
+            android:label="File Browesr" />
         <activity
             android:name=".MyMediaPlayer"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:excludeFromRecents="true"
             android:label="Media Player"
             android:launchMode="singleInstance"
-            android:theme="@style/Theme.Transparent"></activity>
+            android:theme="@style/Theme.Transparent" />
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="FB login"
+            android:theme="@style/Theme.Transparent" />
 
         <receiver android:name=".RemoteControlReceiver">
             <intent-filter>

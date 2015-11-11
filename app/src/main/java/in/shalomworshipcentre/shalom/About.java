@@ -3,12 +3,10 @@ package in.shalomworshipcentre.shalom;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.Switch;
 import android.widget.Toast;
 
 public class About extends AppCompatActivity {
@@ -121,10 +119,9 @@ public class About extends AppCompatActivity {
 
     public void check(View view) {
         if (!DetectConnection.checkInternetConnection(this)) {
-            Toast.makeText(this, "No Internet! Please enable net and retry", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Enable internet to view updates", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Checking for Update..", Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(this, "Checking for Update..", Toast.LENGTH_SHORT).show();
             Intent check = new Intent(About.this, Check.class);
             startActivity(check);
             overridePendingTransition(R.anim.push_down_in, R.anim.push_down_out);

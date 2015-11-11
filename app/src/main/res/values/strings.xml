@@ -8,4 +8,5 @@
     <string name="smart">Load only latest info from \'Home\' page (for slow data connections).</string>
     <string name="browser">Download files using other (external) applications.</string>
     <string name="timer">00 : 00</string>
+    <string name="fbid">877821148937882</string>
 </resources>

@@ -1,14 +1,10 @@
 package in.shalomworshipcentre.shalom;
 
 
-import android.util.Log;
-
 import com.parse.Parse;
-import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseObject;
 import com.parse.ParsePush;
-import com.parse.SaveCallback;
 
 public class Application extends android.app.Application {
     public static final String TODO_GROUP_NAME = "ALL_TODOS";
@@ -23,7 +19,6 @@ public class Application extends android.app.Application {
         // Initialize the Parse SDK.
         Parse.initialize(this, "lOjfvl6jcyvHNSFBOHiyID78lJyFYq09SqyBh8CJ", "PHisWmIVwRHFtdX6VmTZOVr4o2V3yWqKWvSowvkn");
         ParseInstallation.getCurrentInstallation().saveInBackground();
-
         notif = getSharedPreferences(About.settings, MODE_PRIVATE).getBoolean("notif", true);
         if (notif) {
             ParsePush.subscribeInBackground("shalom");

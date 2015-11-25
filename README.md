@@ -1,3 +1,3 @@
 # shalom
 Android App developed for our church.
-it uses webview most of the time.
+uses webview to link to our  website.

@@ -20,7 +20,7 @@ import java.util.List;
 
 public class FileBrowser extends ListActivity {
     private String path;
-    public static String filename, name, part2;
+    public static String filename, name;
     TextView textView;
     boolean audio;
 
@@ -37,7 +37,7 @@ public class FileBrowser extends ListActivity {
             path = getIntent().getStringExtra("path");
         }
         // setTitle(path);
-        textView.setText(path);
+        textView.setText(path.replaceAll("/", " >"));
 
         // Read all files sorted into the values-array
         List values = new ArrayList();
@@ -87,7 +87,7 @@ public class FileBrowser extends ListActivity {
                 Toast.makeText(this, "No handler for this type of file.", Toast.LENGTH_SHORT).show();
             }
         } else if (isSong()) {
-            audio = getSharedPreferences(About.settings, MODE_PRIVATE).getBoolean("audio", true);
+            audio = getSharedPreferences("settings", MODE_PRIVATE).getBoolean("audio", true);
             if (audio) {
                 Intent newIntent = new Intent(this, MyMediaPlayer.class);
                 startActivity(newIntent);
@@ -135,13 +135,7 @@ public class FileBrowser extends ListActivity {
     }
 
     public void back() {
-        // invert filename
-        path = new StringBuffer(path).reverse().toString();
-        // take off first part at /
-        String[] parts = path.split("/", 2);
-        part2 = parts[1];
-        // re invert part 2
-        path = new StringBuffer(part2).reverse().toString();
+        path = path.substring(0, path.lastIndexOf('/'));
         Intent intent = new Intent(this, FileBrowser.class);
         intent.putExtra("path", path);
         startActivity(intent);
@@ -149,11 +143,10 @@ public class FileBrowser extends ListActivity {
     }
 
     public void goBack(View view) {
-        if (path.equals("/storage")) {
+        if (path.equals("/storage"))
             super.onBackPressed();
-        } else {
+        else
             back();
-        }
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 

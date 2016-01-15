@@ -19,7 +19,7 @@ public class Application extends android.app.Application {
         // Initialize the Parse SDK.
         Parse.initialize(this, "lOjfvl6jcyvHNSFBOHiyID78lJyFYq09SqyBh8CJ", "PHisWmIVwRHFtdX6VmTZOVr4o2V3yWqKWvSowvkn");
         ParseInstallation.getCurrentInstallation().saveInBackground();
-        notif = getSharedPreferences(About.settings, MODE_PRIVATE).getBoolean("notif", true);
+        notif = getSharedPreferences("settings", MODE_PRIVATE).getBoolean("notif", true);
         if (notif) {
             ParsePush.subscribeInBackground("shalom");
         } else {

@@ -12,7 +12,6 @@ import android.widget.Toast;
 public class About extends AppCompatActivity {
     public CheckBox mySwitch, checkBox, checkBox2, checkBox3;
     public SharedPreferences prefs;
-    public static String settings = "settings";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +22,7 @@ public class About extends AppCompatActivity {
     }
 
     public void settings() {
-        prefs = getSharedPreferences(settings, MODE_PRIVATE);
+        prefs = getSharedPreferences("settings", MODE_PRIVATE);
 
         mySwitch = (CheckBox) findViewById(R.id.mySwitch);
         mySwitch.setChecked(prefs.getBoolean("smart", false));
@@ -118,13 +117,13 @@ public class About extends AppCompatActivity {
     }
 
     public void check(View view) {
-        if (!DetectConnection.checkInternetConnection(this)) {
+        if (!Helper.checkInternetConnection(this)) {
             Toast.makeText(this, "Enable internet to view updates", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Checking for Update..", Toast.LENGTH_SHORT).show();
             Intent check = new Intent(About.this, Check.class);
             startActivity(check);
-            overridePendingTransition(R.anim.push_down_in, R.anim.push_down_out);
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
 
         }
     }

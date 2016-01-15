@@ -55,11 +55,6 @@ public class Check extends AppCompatActivity {
 
     }
 
-    public void readWebpage(View v) {
-        DownloadPage task = new DownloadPage(myWebView);
-        task.execute(new String[]{"http://shalomworshipcentre.in/"});
-    }
-
     @Override
     public void onBackPressed() {
         if (myWebView.canGoBack())

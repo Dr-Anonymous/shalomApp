@@ -1,7 +1,9 @@
 package in.shalomworshipcentre.shalom;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
 import android.view.View;
 
 import com.parse.ConfigCallback;
@@ -27,11 +29,11 @@ class Helper {
                     if (e == null) {
                         text = config.getString("text", null);
                         file = config.getParseFile("pic", null);
-                        img();
+                        set();
                     } else {
                         text = (ParseConfig.getCurrentConfig()).getString("text", null);
                         file = (ParseConfig.getCurrentConfig()).getParseFile("pic", null);
-                        img();
+                        set();
                     }
                     Notif.progressBar.setVisibility(View.GONE);
                 }
@@ -39,21 +41,37 @@ class Helper {
         } else {
             text = (ParseConfig.getCurrentConfig()).getString("text", null);
             file = (ParseConfig.getCurrentConfig()).getParseFile("pic", null);
-            img();
+            set();
             Notif.progressBar.setVisibility(View.GONE);
         }
     }
 
-    static private void img() {
-        if (file != null) {
-            file.getDataInBackground(new GetDataCallback() {
-                @Override
-                public void done(byte[] data, com.parse.ParseException e) {
+    static private void set() {
+        file.getDataInBackground(new GetDataCallback() {
+            @Override
+            public void done(byte[] data, com.parse.ParseException e) {
+                try {
                     Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
                     Notif.pic.setImageBitmap(bmp);
+                } catch (NullPointerException n) {
                 }
-            });
-        }
+            }
+        });
         Notif.server.setText(text);
+
+    }
+
+    public static boolean checkInternetConnection(Context context) {
+
+        ConnectivityManager con_manager = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        if (con_manager.getActiveNetworkInfo() != null
+                && con_manager.getActiveNetworkInfo().isAvailable()
+                && con_manager.getActiveNetworkInfo().isConnected()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

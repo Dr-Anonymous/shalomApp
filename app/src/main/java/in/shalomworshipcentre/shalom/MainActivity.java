@@ -27,34 +27,24 @@ import org.json.JSONObject;
 
 
 public class MainActivity extends AppCompatActivity {
-    private ImageView one = null;
-    private ImageView a = null;
-    private ImageView b = null;
-    private ImageView c = null;
-    private ImageView d = null;
-    private ImageView e = null;
-    private ImageView f = null;
+    private ImageView one, a, b, c, d, e, f;
     private FrameLayout mContainer;
     private WebView myWebView, popupView;
     String homeUrl, pushStore;
     private ProgressBar progress;
     static boolean smart, isFirstRun, download;
     WebSettings webSettings;
-    /*LoginButton loginButton;
-    CallbackManager callbackManager;
-    AccessTokenTracker accessTokenTracker;
-    AccessToken accessToken;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //show help screen on first run
-        isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE).getBoolean("isFirstRun", true);
+        isFirstRun = getSharedPreferences("settings", MODE_PRIVATE).getBoolean("isFirstRun", true);
         if (isFirstRun) {
             Intent first = new Intent(MainActivity.this, New.class);
             startActivity(first);
-            getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit().putBoolean("isFirstRun", false).commit();
+            getSharedPreferences("settings", MODE_PRIVATE).edit().putBoolean("isFirstRun", false).commit();
         }
 
         // layout initialising
@@ -62,18 +52,17 @@ public class MainActivity extends AppCompatActivity {
         mContainer = (FrameLayout) findViewById(R.id.webview_frame);
         progress = (ProgressBar) findViewById(R.id.progressBar);
         progress.setVisibility(View.GONE);
-        //loginButton = (LoginButton) findViewById(R.id.login_button);
 
         one = (ImageView) findViewById(R.id.show);
         one.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 showbtn();
-
             }
         });
         a = (ImageView) findViewById(R.id.a);
         a.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+                hidebtn();
                 Intent about = new Intent(MainActivity.this, About.class);
                 startActivity(about);
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
@@ -82,16 +71,18 @@ public class MainActivity extends AppCompatActivity {
         b = (ImageView) findViewById(R.id.b);
         b.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+                hidebtn();
                 Intent notif = new Intent(MainActivity.this, Notif.class);
                 startActivity(notif);
-                overridePendingTransition(R.anim.push_down_in, R.anim.push_down_out);
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
 
             }
         });
         c = (ImageView) findViewById(R.id.c);
         c.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                if (!DetectConnection.checkInternetConnection(MainActivity.this)) {
+                hidebtn();
+                if (!Helper.checkInternetConnection(MainActivity.this)) {
                     restart();
                 } else {
                     Toast.makeText(MainActivity.this, "Refreshing..", Toast.LENGTH_LONG).show();
@@ -102,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         d = (ImageView) findViewById(R.id.d);
         d.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+                hidebtn();
                 Intent share = new Intent();
                 share.setAction(Intent.ACTION_SEND);
                 String Url = myWebView.getUrl();
@@ -121,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
         f = (ImageView) findViewById(R.id.f);
         f.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+                hidebtn();
                 Intent browse = new Intent(MainActivity.this, FileBrowser.class);
                 startActivity(browse);
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
@@ -155,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setAppCacheEnabled(true);
         // load online by default
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        if (!DetectConnection.checkInternetConnection(this)) {
+        if (!Helper.checkInternetConnection(this)) {
             // loading offline
             webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
             Toast.makeText(MainActivity.this, "Offline mode", Toast.LENGTH_SHORT).show();
@@ -165,24 +158,15 @@ public class MainActivity extends AppCompatActivity {
         //zoom
         webSettings.setBuiltInZoomControls(true);
         webSettings.setDisplayZoomControls(false);
-
+        setDownload(myWebView);
         // smartHome url or not
-        smart = getSharedPreferences(About.settings, MODE_PRIVATE).getBoolean("smart", false);
+        smart = getSharedPreferences("settings", MODE_PRIVATE).getBoolean("smart", false);
         if (smart) {
             homeUrl = "http://shalomworshipcentre.in/mobile.html";
         } else {
             homeUrl = "http://shalomworshipcentre.in/";
         }
         myWebView.loadUrl(homeUrl);
-
-        //downloading files using external browser or internal download listner
-        download = getSharedPreferences(About.settings, MODE_PRIVATE).getBoolean("download", false);
-        if (download) {
-            getFile(myWebView);
-        } else {
-            myWebView.setDownloadListener(new MyDownloadListener(myWebView.getContext()));
-        }
-        //    fb();
         // push notifications-
         parse();
     }
@@ -213,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
             webSettings.setJavaScriptEnabled(true);
             webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
             webSettings.setSupportMultipleWindows(true);
+            webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
             popupView.setWebChromeClient(this);
             popupView.setWebViewClient(new UriWebViewClient());
             popupView.setLayoutParams(new RelativeLayout.LayoutParams(
@@ -220,11 +205,7 @@ public class MainActivity extends AppCompatActivity {
                     RelativeLayout.LayoutParams.MATCH_PARENT
             ));
             this.container.addView(popupView);
-            if (download) {
-                getFile(popupView);
-            } else {
-                popupView.setDownloadListener(new MyDownloadListener(popupView.getContext()));
-            }
+            setDownload(popupView);
             // send popup window infos back to main (cross-document messaging)
             WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
             transport.setWebView(popupView);
@@ -243,7 +224,22 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             String host = Uri.parse(url).getHost();
-            if (host.contains("shalomworshipcentre.in") || host.contains("facebook")) {
+            if (host == null) {
+                if (url.startsWith("tel:")) {
+                    Intent tel = new Intent(Intent.ACTION_DIAL, Uri.parse(url));
+                    startActivity(tel);
+                    return true;
+                } else if (url.startsWith("mailto:")) {
+                    String body = "Enter your question, prayer request or feedback below:\n\n";
+                    Intent mail = new Intent(Intent.ACTION_SEND);
+                    mail.setType("application/octet-stream");
+                    mail.putExtra(Intent.EXTRA_EMAIL, new String[]{url.substring(url.indexOf(":") + 1, url.length())});
+                    mail.putExtra(Intent.EXTRA_SUBJECT, " ");
+                    mail.putExtra(Intent.EXTRA_TEXT, body);
+                    startActivity(mail);
+                    return true;
+                }
+            } else if (host.contains("shalomworshipcentre.in") || host.contains("facebook") || host.contains("messages")) {
                 return false;
             }
             // Otherwise, the link is not for a page on my site
@@ -360,6 +356,46 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
     }
 
+    // parse code
+    public void parse() {
+        try {
+            Bundle extras = getIntent().getExtras();
+            if (extras != null) {
+                String jsonData = extras.getString("com.parse.Data");
+                JSONObject json = new JSONObject(jsonData);
+                pushStore = json.getString("alert");
+                if (json.getString("alert").equals("update available")) {
+                    if (Helper.checkInternetConnection(MainActivity.this)) {
+                        Intent a = new Intent(MainActivity.this, Check.class);
+                        startActivity(a);
+                    } else
+                        Toast.makeText(MainActivity.this, "Enable internet to view updates", Toast.LENGTH_LONG).show();
+                } else {
+                    Intent a = new Intent(MainActivity.this, Notif.class);
+                    a.putExtra("txt", pushStore);
+                    startActivity(a);
+                }
+            }
+        } catch (JSONException e) {
+        } catch (NullPointerException n) {
+        }
+    }
+
+    public void setDownload(WebView wv) {
+        //downloading files using external browser or internal download listner
+        download = getSharedPreferences("settings", MODE_PRIVATE).getBoolean("download", false);
+        if (download) {
+            wv.setDownloadListener(new DownloadListener() {
+                public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(url));
+                    startActivity(i);
+                }
+            });
+        } else {
+            wv.setDownloadListener(new MyDownloadListener(wv.getContext()));
+        }
+    }
    /* public void fb() {
         loginButton.setReadPermissions("user_friends");
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -418,47 +454,15 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         accessTokenTracker.stopTracking();
     }*/
-
-
-    // parse code
-    public void parse() {
-        try {
-            Bundle extras = getIntent().getExtras();
-            if (extras != null) {
-                String jsonData = extras.getString("com.parse.Data");
-                JSONObject json = new JSONObject(jsonData);
-                pushStore = json.getString("alert");
-                if (json.getString("alert").equals("update available")) {
-                    if (DetectConnection.checkInternetConnection(MainActivity.this)) {
-                        Intent a = new Intent(MainActivity.this, Check.class);
-                        startActivity(a);
-                    } else
-                        Toast.makeText(MainActivity.this, "Enable internet to view updates", Toast.LENGTH_LONG).show();
-                } else {
-                    Intent a = new Intent(MainActivity.this, Notif.class);
-                    a.putExtra("txt", pushStore);
-                    startActivity(a);
-                }
-            }
-        } catch (JSONException e) {
-        } catch (NullPointerException n) {
-        }
-    }
-
-    public void getFile(WebView view) {
-        view.setDownloadListener(new DownloadListener() {
-            public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
-            }
-        });
-    }
-        /*  Handler h = new Handler();
+    /*
+      Handler h = new Handler();
                 h.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        // DO DELAYED STUFF
+                        //do delay stuff here
+                        }
                     }
-                }, 3000);*/
+                }, 5000);
+     */
+
 }

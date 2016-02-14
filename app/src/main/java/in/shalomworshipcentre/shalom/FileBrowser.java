@@ -87,7 +87,7 @@ public class FileBrowser extends ListActivity {
                 Toast.makeText(this, "No handler for this type of file.", Toast.LENGTH_SHORT).show();
             }
         } else if (isSong()) {
-            audio = getSharedPreferences("settings", MODE_PRIVATE).getBoolean("audio", true);
+            audio = getSharedPreferences("settings", MODE_PRIVATE).getBoolean("audio", false);
             if (audio) {
                 Intent newIntent = new Intent(this, MyMediaPlayer.class);
                 startActivity(newIntent);

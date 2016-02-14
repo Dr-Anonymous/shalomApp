@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -22,17 +23,24 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 
 public class MainActivity extends AppCompatActivity {
     private ImageView one, a, b, c, d, e, f;
     private FrameLayout mContainer;
     private WebView myWebView, popupView;
-    String homeUrl, pushStore;
     private ProgressBar progress;
-    static boolean smart, isFirstRun, download;
+    String homeUrl;
+    static boolean smart, isFirstRun, download, notif;
     WebSettings webSettings;
 
     @Override
@@ -148,27 +156,30 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setAppCacheEnabled(true);
         // load online by default
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+
+
         if (!Helper.checkInternetConnection(this)) {
             // loading offline
             webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
             Toast.makeText(MainActivity.this, "Offline mode", Toast.LENGTH_SHORT).show();
         }
-        //HTML5 localstorage feature
+        //HTML5 local storage feature
         webSettings.setDomStorageEnabled(true);
         //zoom
         webSettings.setBuiltInZoomControls(true);
         webSettings.setDisplayZoomControls(false);
-        setDownload(myWebView);
-        // smartHome url or not
+        setDownloader(myWebView);
+        // mobile (slow network) url or not
         smart = getSharedPreferences("settings", MODE_PRIVATE).getBoolean("smart", false);
         if (smart) {
-            homeUrl = "http://shalomworshipcentre.in/mobile.html";
+            homeUrl = "http://shalomworshipcentre.in/androidApp/mobile.html";
         } else {
-            homeUrl = "http://shalomworshipcentre.in/";
+            homeUrl = "http://shalomworshipcentre.in";
         }
         myWebView.loadUrl(homeUrl);
-        // push notifications-
-        parse();
+        // opted for notifications?
+        notif = getSharedPreferences("settings", MODE_PRIVATE).getBoolean("notif", true);
+        if (notif && Helper.checkInternetConnection(this)) checkForNotifications();
     }
 
     public class MyChromeClient extends WebChromeClient {
@@ -205,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
                     RelativeLayout.LayoutParams.MATCH_PARENT
             ));
             this.container.addView(popupView);
-            setDownload(popupView);
+            setDownloader(popupView);
             // send popup window infos back to main (cross-document messaging)
             WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
             transport.setWebView(popupView);
@@ -330,7 +341,6 @@ public class MainActivity extends AppCompatActivity {
         one.setVisibility(View.VISIBLE);
     }
 
-
     private static final int TIME_INTERVAL = 2000;
     private long mBackPressed;
 
@@ -341,47 +351,20 @@ public class MainActivity extends AppCompatActivity {
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             return;
         } else {
-            Toast.makeText(getBaseContext(), "Tap once more to exit", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Tap once more to exit", Toast.LENGTH_SHORT).show();
         }
         mBackPressed = System.currentTimeMillis();
     }
 
-
     public void restart() {
         Toast.makeText(MainActivity.this, "Reloading..", Toast.LENGTH_SHORT).show();
-        Intent i = getBaseContext().getPackageManager()
-                .getLaunchIntentForPackage(getBaseContext().getPackageName());
+        Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
     }
 
-    // parse code
-    public void parse() {
-        try {
-            Bundle extras = getIntent().getExtras();
-            if (extras != null) {
-                String jsonData = extras.getString("com.parse.Data");
-                JSONObject json = new JSONObject(jsonData);
-                pushStore = json.getString("alert");
-                if (json.getString("alert").equals("update available")) {
-                    if (Helper.checkInternetConnection(MainActivity.this)) {
-                        Intent a = new Intent(MainActivity.this, Check.class);
-                        startActivity(a);
-                    } else
-                        Toast.makeText(MainActivity.this, "Enable internet to view updates", Toast.LENGTH_LONG).show();
-                } else {
-                    Intent a = new Intent(MainActivity.this, Notif.class);
-                    a.putExtra("txt", pushStore);
-                    startActivity(a);
-                }
-            }
-        } catch (JSONException e) {
-        } catch (NullPointerException n) {
-        }
-    }
-
-    public void setDownload(WebView wv) {
+    public void setDownloader(WebView wv) {
         //downloading files using external browser or internal download listner
         download = getSharedPreferences("settings", MODE_PRIVATE).getBoolean("download", false);
         if (download) {
@@ -396,64 +379,46 @@ public class MainActivity extends AppCompatActivity {
             wv.setDownloadListener(new MyDownloadListener(wv.getContext()));
         }
     }
-   /* public void fb() {
-        loginButton.setReadPermissions("user_friends");
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        callbackManager = CallbackManager.Factory.create();
-        accessTokenTracker = new AccessTokenTracker() {
-            @Override
-            protected void onCurrentAccessTokenChanged(
-                    AccessToken oldAccessToken,
-                    AccessToken currentAccessToken) {
-                // Set the access token using
-                // currentAccessToken when it's loaded or set.
-            }
-        };
-        // If the access token is available already assign it.
-        accessToken = AccessToken.getCurrentAccessToken();
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                // App code
-            }
 
-            @Override
-            public void onCancel() {
-                // App code
-            }
-
-            @Override
-            public void onError(FacebookException exception) {
-                // App code
-            }
-        });
+    public void checkForNotifications() {
+        checkingForNotif task = new checkingForNotif();
+        task.execute(new String[]{"http://shalomworshipcentre.in/androidApp/appNotifications.txt"});
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Logs 'install' and 'app activate' App Events.
-        AppEventsLogger.activateApp(this);
-    }
+    public class checkingForNotif extends AsyncTask<String, Void, String> {
+        private String v;
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        // Logs 'app deactivate' App Event.
-        AppEventsLogger.deactivateApp(this);
-    }
+        protected String doInBackground(String... urls) {
+            String responseStr = null;
+            try {
+                for (String url : urls) {
+                    DefaultHttpClient httpClient = new DefaultHttpClient();
+                    HttpGet get = new HttpGet(url);
+                    HttpResponse httpResponse = httpClient.execute(get);
+                    HttpEntity httpEntity = httpResponse.getEntity();
+                    responseStr = EntityUtils.toString(httpEntity);
+                }
+            } catch (UnsupportedEncodingException e) {
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-    }
+            } catch (ClientProtocolException e) {
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        accessTokenTracker.stopTracking();
-    }*/
+            } catch (IOException e) {
+
+            }
+            return responseStr;
+        }
+
+        protected void onPostExecute(String responseStr) {
+            v = responseStr;
+            // retrieve the notification available locally-
+            String newMessage = getSharedPreferences("settings", MODE_PRIVATE).getString("knock", "Nothing new for now :-)");
+            // check if anything new & if so--
+            if (!newMessage.equals(v)) {
+                getSharedPreferences("settings", MODE_PRIVATE).edit().putString("knock", v).commit();
+                b.setVisibility(View.VISIBLE);
+            }
+        }
+    }
     /*
       Handler h = new Handler();
                 h.postDelayed(new Runnable() {
@@ -461,8 +426,6 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         //do delay stuff here
                         }
-                    }
                 }, 5000);
      */
-
 }

@@ -49,10 +49,7 @@ public class Check extends AppCompatActivity {
         } else {
             myWebView.setDownloadListener(new MyDownloadListener(myWebView.getContext()));
         }
-        myWebView.loadUrl("http://shalomworshipcentre.in/appupdate.html");
-
-        // readWebpage(myWebView);
-
+        myWebView.loadUrl("http://shalomworshipcentre.in/androidApp/appupdate.html");
     }
 
     @Override

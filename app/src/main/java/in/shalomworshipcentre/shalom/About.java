@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 public class About extends AppCompatActivity {
     public CheckBox mySwitch, checkBox, checkBox2, checkBox3;
-    public SharedPreferences prefs;
+    public static SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +20,7 @@ public class About extends AppCompatActivity {
         settings();
 
     }
+
 
     public void settings() {
         prefs = getSharedPreferences("settings", MODE_PRIVATE);
@@ -33,15 +34,11 @@ public class About extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
                 if (isChecked) {
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean("smart", true);
-                    editor.commit();
+                    prefs.edit().putBoolean("smart", true).commit();
                     // then restart
                     restart();
                 } else {
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean("smart", false);
-                    editor.commit();
+                    prefs.edit().putBoolean("smart", false).commit();
                     // then restart
                     restart();
                 }
@@ -57,14 +54,10 @@ public class About extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
                 if (isChecked) {
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean("download", true);
-                    editor.commit();
+                    prefs.edit().putBoolean("download", true).commit();
                     restart();
                 } else {
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean("download", false);
-                    editor.commit();
+                    prefs.edit().putBoolean("download", false).commit();
                     restart();
                 }
             }
@@ -78,30 +71,22 @@ public class About extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
                 if (isChecked) {
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean("notif", true);
-                    editor.commit();
+                    prefs.edit().putBoolean("notif", true).commit();
                 } else {
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean("notif", false);
-                    editor.commit();
+                    prefs.edit().putBoolean("notif", false).commit();
                 }
             }
         });
         checkBox3 = (CheckBox) findViewById(R.id.chk3);
-        checkBox3.setChecked(prefs.getBoolean("audio", true));
+        checkBox3.setChecked(prefs.getBoolean("audio", false));
         checkBox3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
                 if (isChecked) {
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean("audio", true);
-                    editor.commit();
+                    prefs.edit().putBoolean("audio", true).commit();
                 } else {
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean("audio", false);
-                    editor.commit();
+                    prefs.edit().putBoolean("audio", false).commit();
                 }
             }
         });

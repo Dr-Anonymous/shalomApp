@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         if (isFirstRun) {
             Intent first = new Intent(MainActivity.this, New.class);
             startActivity(first);
-            getSharedPreferences("settings", MODE_PRIVATE).edit().putBoolean("isFirstRun", false).commit();
+            getSharedPreferences("settings", MODE_PRIVATE).edit().putBoolean("isFirstRun", false).apply();
         }
 
         // layout initialising
